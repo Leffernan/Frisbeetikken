@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#282c20" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Produktimport – Frisbeetikken</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource-variable/mona-sans/index.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <header class="admin-header">
+      <a class="brand" href="./index.html" aria-label="Tilbake til Frisbeetikken">
+        <span class="brand-soft">FRIS</span><span class="brand-strong">BEETIKKEN</span>
+      </a>
+      <div class="session-actions" id="session-actions" hidden>
+        <span id="session-email"></span>
+        <button class="text-button" id="logout" type="button">Logg ut</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="login-panel panel" id="login-panel">
+        <p class="eyebrow">Administrasjon</p>
+        <h1>Logg inn</h1>
+        <p>Kun godkjente administratorer kan laste opp bilder og endre produkter.</p>
+        <form id="login-form">
+          <label>E-post <input name="email" type="email" autocomplete="username" required /></label>
+          <label>Passord <input name="password" type="password" autocomplete="current-password" required /></label>
+          <button class="primary-button" type="submit">Logg inn</button>
+          <p class="form-status" id="login-status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="workspace" id="workspace" hidden>
+        <div class="intro">
+          <div>
+            <p class="eyebrow">Produktimport</p>
+            <h1>Last opp alle bildene på én gang</h1>
+          </div>
+          <p>Navngi dem <strong>001_f</strong> og <strong>001_b</strong>. Vi kobler forside og bakside sammen og spør hva hvert produkt er.</p>
+        </div>
+
+        <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-controls="file-input">
+          <input id="file-input" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif" hidden />
+          <span class="drop-icon" aria-hidden="true">＋</span>
+          <strong>Dra bildene hit</strong>
+          <span>eller klikk for å velge filer</span>
+          <small>JPG, PNG, WebP eller AVIF · maks 10 MB per bilde</small>
+        </div>
+
+        <div class="import-summary" id="import-summary" hidden>
+          <div>
+            <strong id="group-count"></strong>
+            <span id="file-count"></span>
+          </div>
+          <button class="secondary-button" id="choose-again" type="button">Velg bilder på nytt</button>
+        </div>
+
+        <div class="file-errors" id="file-errors" hidden aria-live="polite"></div>
+        <div class="product-editors" id="product-editors"></div>
+
+        <div class="publish-bar" id="publish-bar" hidden>
+          <div class="publish-progress">
+            <strong id="publish-title">Klar til opplasting</strong>
+            <span id="publish-detail">Kontroller produktinformasjonen først.</span>
+            <progress id="publish-progress" value="0" max="1"></progress>
+          </div>
+          <button class="primary-button" id="publish-all" type="button">Last opp og lagre</button>
+        </div>
+      </section>
+    </main>
+
+    <datalist id="manufacturer-options"></datalist>
+    <datalist id="plastic-options"></datalist>
+    <script type="module" src="./admin.js"></script>
+  </body>
+</html>

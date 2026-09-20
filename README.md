@@ -23,24 +23,28 @@ npm run serve
 
 Åpne deretter `http://localhost:4173`.
 
-## Legg til produkter
+## Legg til produkter og bilder
 
-Produktinformasjonen ligger i `data/products.json`. Hver fysisk disk skal ha et unikt varenummer.
-
-Legg bildene i `assets/products/` med dette formatet:
+Den innloggede administrasjonssiden ligger på `admin.html`. Den grupperer automatisk bilder med samme varenummer:
 
 ```text
-001__Innova-Destroyer__front__10.jpg
-001__Innova-Destroyer__back__10.jpg
+001_f.jpg  # forside
+001_b.jpg  # bakside
+002_f.jpg
+002_b.jpg
 ```
 
-Dobbel understrek skiller feltene. Dette gjør produktnavn med vanlig bindestrek trygge. Kjør deretter:
+Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
 
-```bash
-npm run sync:images
-```
+Første gangs oppsett:
 
-Når varen finnes i Supabase, finner butikken automatisk front- og baksidebildet ut fra varenummer, produktnavn og grad. JPG, JPEG, PNG, WebP og AVIF støttes. Skriptet kontrollerer i tillegg filnavnet og sammenligner mot lokale produktdata når varen finnes der.
+1. Kjør siste versjon av `supabase/schema.sql` i SQL Editor.
+2. Gå til **Authentication → Users** og opprett én bruker for deg selv.
+3. Kopier brukerens UUID og kjør `insert into public.admin_users (user_id) values ('DIN-UUID');` i SQL Editor.
+4. Slå av **Allow new users to sign up** under Authentication-innstillingene.
+5. Åpne `https://leffernan.github.io/Frisbeetikken/admin.html` og logg inn.
+
+Den gamle lokale bildeimporten i `assets/products/` finnes fortsatt for utvikling, men er ikke nødvendig når administrasjonssiden brukes.
 
 ## Aktiver reservasjoner
 
