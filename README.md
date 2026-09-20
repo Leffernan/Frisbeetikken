@@ -34,7 +34,7 @@ Den innloggede administrasjonssiden ligger på `admin.html`. Den grupperer autom
 002_b.jpg
 ```
 
-Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
+Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype, eventuell ink i rim og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
 
 Første gangs oppsett:
 

@@ -11,6 +11,7 @@ create table if not exists public.products (
   grade smallint not null check (grade between 0 and 10),
   weight smallint check (weight between 1 and 300),
   plastic text,
+  rim_ink text not null default 'no' constraint products_rim_ink_check check (rim_ink in ('no', 'barely', 'yes')),
   note text,
   image_front text,
   image_back text,
@@ -19,6 +20,24 @@ create table if not exists public.products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Legger feltet til også når products-tabellen allerede finnes fra et tidligere oppsett.
+alter table public.products
+  add column if not exists rim_ink text not null default 'no';
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'products_rim_ink_check'
+      and conrelid = 'public.products'::regclass
+  ) then
+    alter table public.products
+      add constraint products_rim_ink_check check (rim_ink in ('no', 'barely', 'yes'));
+  end if;
+end;
+$$;
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),

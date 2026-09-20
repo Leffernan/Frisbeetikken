@@ -118,12 +118,17 @@ function fromDatabaseProduct(row) {
     grade: Number(row.grade),
     weight: row.weight,
     plastic: row.plastic,
+    rimInk: row.rim_ink || "no",
     note: row.note?.replace(/\bdisc\b/gi, "disk"),
     createdAt: row.created_at,
     status: row.status,
     images: { front: row.image_front || "", back: row.image_back || "" },
     color: row.color || "#d2ff00",
   };
+}
+
+function rimInkLabel(value) {
+  return ({ no: "Nei", barely: "Så vidt", yes: "Ja" })[value] || "Nei";
 }
 
 function supabaseHeaders() {
@@ -216,6 +221,7 @@ function openProduct(product) {
           <div><span>Grad</span><strong>${product.grade}/10</strong></div>
           <div><span>Vekt</span><strong>${product.weight ? `${product.weight} g` : "–"}</strong></div>
           <div><span>Plast</span><strong>${escapeXml(product.plastic || "–")}</strong></div>
+          <div><span>Ink i rim</span><strong>${rimInkLabel(product.rimInk)}</strong></div>
         </div>
         <p class="detail-note">${escapeXml(product.note || "Ingen merknader registrert.")}</p>
         <p class="detail-number">Varenummer ${escapeXml(product.id)}</p>

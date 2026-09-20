@@ -259,6 +259,18 @@ function renderGroups() {
             <label>Plasttype
               <input data-field="plastic" list="plastic-options" value="${escapeHtml(product.plastic)}" />
             </label>
+            <fieldset class="field-wide rim-ink-field">
+              <legend>Er det ink i rim?</legend>
+              <div class="segmented-options">
+                ${[
+                  ["no", "Nei"], ["barely", "Så vidt"], ["yes", "Ja"],
+                ].map(([value, label]) => `
+                  <label>
+                    <input data-field="rim_ink" type="radio" name="rim-ink-${escapeHtml(group.id)}" value="${value}" ${(product.rim_ink || "no") === value ? "checked" : ""} />
+                    <span>${label}</span>
+                  </label>`).join("")}
+              </div>
+            </fieldset>
             <label>Status
               <select data-field="status">${statusOptions(product.status || "available")}</select>
             </label>
@@ -312,6 +324,7 @@ function readProduct(card, group) {
     grade: Number(get("grade")),
     weight: get("weight") ? Number(get("weight")) : null,
     plastic: get("plastic") || null,
+    rim_ink: $('[data-field="rim_ink"]:checked', card)?.value || "no",
     note: get("note") || null,
     status: get("status"),
     image_front: existing.image_front || null,

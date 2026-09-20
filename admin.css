@@ -49,6 +49,8 @@ h1 { margin: 0; font-size: clamp(38px, 5vw, 68px); font-variation-settings: "wdt
 .login-panel > p:not(.eyebrow) { color: var(--muted); line-height: 1.55; }
 .login-panel form { display: grid; gap: 16px; margin-top: 28px; }
 label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .4px; }
+fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+legend { margin-bottom: 7px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .4px; }
 input, select, textarea {
   width: 100%;
   min-height: 48px;
@@ -127,6 +129,14 @@ button:disabled { opacity: .48; cursor: wait; }
 .field-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .field-wide { grid-column: span 2; }
 .field-full { grid-column: 1 / -1; }
+.rim-ink-field { align-self: end; }
+.segmented-options { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 48px; overflow: hidden; border: 1px solid var(--soft); border-radius: 9px; }
+.segmented-options label { position: relative; display: grid; place-items: center; color: var(--ink); background: var(--paper); cursor: pointer; }
+.segmented-options label + label { border-left: 1px solid var(--soft); }
+.segmented-options input { position: absolute; width: 1px; height: 1px; min-height: 0; opacity: 0; }
+.segmented-options span { display: grid; width: 100%; height: 100%; place-items: center; padding: 8px; }
+.segmented-options input:checked + span { color: var(--paper); background: var(--forest); }
+.segmented-options input:focus-visible + span { box-shadow: inset 0 0 0 3px var(--lime); }
 .editor-status { min-height: 18px; margin: 13px 0 0; color: var(--muted); font-size: 13px; }
 .is-error .editor-status { color: var(--red); }
 .is-done .editor-status { color: var(--green); font-weight: 700; }
