@@ -54,6 +54,14 @@ on public.products for select
 to anon, authenticated
 using (status in ('available', 'reserved'));
 
+-- "Automatically expose new tables" er slått av i prosjektet.
+-- Gi derfor bare den ene offentlige lesetilgangen butikken faktisk trenger.
+grant usage on schema public to anon, authenticated;
+revoke all on table public.products from anon, authenticated;
+revoke all on table public.orders from anon, authenticated;
+revoke all on table public.order_items from anon, authenticated;
+grant select on table public.products to anon, authenticated;
+
 -- Kundedata er aldri tilgjengelig via den offentlige nøkkelen.
 -- Oppretting skjer bare gjennom reserve_order() nedenfor.
 
