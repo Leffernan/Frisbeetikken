@@ -24,7 +24,7 @@ for (const filename of files) {
   const [, id, productSlug, side, grade] = match;
   const product = productById.get(id);
   if (!product) {
-    errors.push(`${filename}: varenummer ${id} finnes ikke i data/products.json`);
+    console.warn(`${filename}: varenummer ${id} kontrolleres mot Supabase ved visning.`);
     continue;
   }
   if (Number(grade) !== Number(product.grade)) {

@@ -40,7 +40,7 @@ Dobbel understrek skiller feltene. Dette gjør produktnavn med vanlig bindestrek
 npm run sync:images
 ```
 
-Skriptet kontrollerer varenummer, produktnavn og grad, og kobler bildene til riktig produkt. Det stopper publisering hvis noe ikke stemmer.
+Når varen finnes i Supabase, finner butikken automatisk front- og baksidebildet ut fra varenummer, produktnavn og grad. JPG, JPEG, PNG, WebP og AVIF støttes. Skriptet kontrollerer i tillegg filnavnet og sammenligner mot lokale produktdata når varen finnes der.
 
 ## Aktiver reservasjoner
 

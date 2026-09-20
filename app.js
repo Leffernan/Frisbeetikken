@@ -57,8 +57,32 @@ function placeholderImage(product, side = "front") {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-function imageFor(product, side = "front") {
-  return product.images?.[side] || placeholderImage(product, side);
+function productSlug(product) {
+  return `${product.manufacturer}-${product.model}`
+    .normalize("NFKD")
+    .replace(/[°]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function productImageCandidates(product, side = "front") {
+  if (product.images?.[side]) return [product.images[side]];
+  const base = `./assets/products/${product.id}__${productSlug(product)}__${side}__${product.grade}`;
+  return ["jpg", "jpeg", "png", "webp", "avif"].map((extension) => `${base}.${extension}`);
+}
+
+function applyProductImage(image, product, side = "front") {
+  const candidates = productImageCandidates(product, side);
+  let index = 0;
+  image.onerror = () => {
+    if (index < candidates.length) {
+      image.src = candidates[index++];
+    } else {
+      image.onerror = null;
+      image.src = placeholderImage(product, side);
+    }
+  };
+  image.src = candidates[index++];
 }
 
 async function loadProducts() {
@@ -150,7 +174,7 @@ function renderProducts() {
     const openButton = $(".product-open", card);
     const addButton = $(".add-button", card);
     const image = $(".product-image", card);
-    image.src = imageFor(product);
+    applyProductImage(image, product);
     image.alt = `${product.manufacturer} ${product.model}, sett forfra`;
     $(".product-maker", card).textContent = product.manufacturer;
     $(".product-name", card).textContent = product.model;
@@ -178,7 +202,7 @@ function openProduct(product) {
   $("#product-dialog-content").innerHTML = `
     <div class="product-detail">
       <div class="detail-gallery">
-        <img id="detail-image" src="${imageFor(product)}" alt="${escapeXml(product.manufacturer)} ${escapeXml(product.model)}, sett forfra" />
+        <img id="detail-image" alt="${escapeXml(product.manufacturer)} ${escapeXml(product.model)}, sett forfra" />
         <div class="gallery-buttons">
           <button class="active" type="button" data-side="front">Forside</button>
           <button type="button" data-side="back">Bakside</button>
@@ -200,11 +224,13 @@ function openProduct(product) {
         </button>
       </div>
     </div>`;
+  applyProductImage($("#detail-image"), product);
   $$("[data-side]", elements.productDialog).forEach((button) => {
     button.addEventListener("click", () => {
       const side = button.dataset.side;
-      $("#detail-image").src = imageFor(product, side);
-      $("#detail-image").alt = `${product.manufacturer} ${product.model}, ${side === "front" ? "sett forfra" : "sett bakfra"}`;
+      const detailImage = $("#detail-image");
+      applyProductImage(detailImage, product, side);
+      detailImage.alt = `${product.manufacturer} ${product.model}, ${side === "front" ? "sett forfra" : "sett bakfra"}`;
       $$("[data-side]", elements.productDialog).forEach((item) => item.classList.toggle("active", item === button));
     });
   });
@@ -245,7 +271,7 @@ function renderCart() {
   $("#cart-count").textContent = products.length;
   elements.cartItems.innerHTML = products.map((product) => `
     <article class="cart-item">
-      <img src="${imageFor(product)}" alt="" />
+      <img data-cart-image="${escapeXml(product.id)}" alt="" />
       <div>
         <p>${escapeXml(product.manufacturer)}</p>
         <h3>${escapeXml(product.model)}</h3>
@@ -254,6 +280,10 @@ function renderCart() {
       </div>
       <button class="remove-item" type="button" data-remove="${escapeXml(product.id)}">Fjern</button>
     </article>`).join("");
+  $$('[data-cart-image]', elements.cartItems).forEach((image) => {
+    const product = state.products.find((item) => item.id === image.dataset.cartImage);
+    if (product) applyProductImage(image, product);
+  });
   $$('[data-remove]', elements.cartItems).forEach((button) => button.addEventListener("click", () => removeFromCart(button.dataset.remove)));
   elements.cartEmpty.hidden = products.length > 0;
   elements.cartSummary.hidden = products.length === 0;
