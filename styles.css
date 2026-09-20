@@ -3,6 +3,8 @@
   --forest: #17372d;
   --forest-light: #234b3f;
   --lime: #d4ef57;
+  --brand-soft: #899c94;
+  --brand-strong: #ef5138;
   --cream: #f5f1e8;
   --paper: #fbfaf6;
   --muted: #6c756f;
@@ -73,7 +75,9 @@ img { display: block; max-width: 100%; }
   letter-spacing: -1.5px;
   text-decoration: none;
 }
-.brand > span:last-child > span { color: #5a756b; }
+.brand-word { display: inline-flex; letter-spacing: -1.5px; }
+.brand-soft { color: var(--brand-soft); font-weight: 600; }
+.brand-strong { color: var(--brand-strong); font-weight: 700; }
 .brand-mark {
   position: relative;
   display: block;
@@ -88,7 +92,7 @@ img { display: block; max-width: 100%; }
   border: 2px solid var(--forest);
   border-radius: 50%;
 }
-.brand-mark span:nth-child(1) { top: 1px; background: var(--lime); }
+.brand-mark span:nth-child(1) { top: 1px; background: var(--brand-strong); }
 .brand-mark span:nth-child(2) { top: 8px; background: var(--paper); }
 .brand-mark span:nth-child(3) { top: 15px; background: var(--paper); }
 .cart-button {
@@ -208,10 +212,23 @@ img { display: block; max-width: 100%; }
 }
 .hero-disc::before { inset: 12%; }
 .hero-disc::after { inset: 20%; border-style: dashed; }
-.hero-disc span {
-  font: 700 clamp(18px, 2.6vw, 38px)/.9 "Space Grotesk";
-  letter-spacing: -2px;
+.hero-disc .disc-brand {
+  display: grid;
+  gap: 1px;
+  font-family: "Space Grotesk";
   text-align: center;
+}
+.hero-disc .disc-brand small {
+  color: #61766e;
+  font-size: clamp(13px, 1.5vw, 20px);
+  font-weight: 600;
+  letter-spacing: 7px;
+}
+.hero-disc .disc-brand strong {
+  color: var(--brand-strong);
+  font-size: clamp(21px, 3vw, 42px);
+  font-weight: 700;
+  letter-spacing: -2px;
 }
 .hero-stamp {
   position: absolute;
@@ -431,8 +448,8 @@ footer {
   color: #d5dfda;
   background: #0e241d;
 }
-.brand-footer { color: white; }
-.brand-footer > span > span { color: var(--lime) !important; }
+.brand-footer .brand-soft { color: #8ca097; }
+.brand-footer .brand-strong { color: var(--brand-strong); }
 footer p { margin: 0; }
 .footer-small { color: #90a098; font-size: 13px; }
 
