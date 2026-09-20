@@ -19,6 +19,9 @@ const elements = {
   loginForm: $("#login-form"),
   loginStatus: $("#login-status"),
   workspace: $("#workspace"),
+  tabs: $$('[data-admin-view]'),
+  importView: $("#import-view"),
+  manageView: $("#manage-view"),
   sessionActions: $("#session-actions"),
   sessionEmail: $("#session-email"),
   logout: $("#logout"),
@@ -35,6 +38,9 @@ const elements = {
   publishTitle: $("#publish-title"),
   publishDetail: $("#publish-detail"),
   publishProgress: $("#publish-progress"),
+  managerSearch: $("#manager-search"),
+  managerCount: $("#manager-count"),
+  managerList: $("#manager-list"),
   manufacturerOptions: $("#manufacturer-options"),
   plasticOptions: $("#plastic-options"),
 };
@@ -135,6 +141,12 @@ async function loadExistingProducts() {
   const products = await response.json();
   state.products = new Map(products.map((product) => [product.id, product]));
 
+  updateDatalists();
+  renderProductManager();
+}
+
+function updateDatalists() {
+  const products = [...state.products.values()];
   const manufacturers = [...new Set(products.map((product) => product.manufacturer).filter(Boolean))].sort();
   const plastics = [...new Set(products.map((product) => product.plastic).filter(Boolean))].sort();
   elements.manufacturerOptions.innerHTML = manufacturers.map((value) => `<option value="${escapeHtml(value)}"></option>`).join("");
@@ -213,6 +225,104 @@ function statusOptions(selected) {
     ["draft", "Kladd"], ["available", "Tilgjengelig"], ["reserved", "Reservert"],
     ["sold", "Solgt"], ["archived", "Arkivert"],
   ].map(([value, label]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${label}</option>`).join("");
+}
+
+function statusLabel(status) {
+  return ({
+    draft: "Kladd", available: "Tilgjengelig", reserved: "Reservert",
+    sold: "Solgt", archived: "Arkivert",
+  })[status] || status;
+}
+
+function managerImage(url, label, className = "") {
+  return url
+    ? `<div class="manager-image ${className}"><img src="${escapeHtml(url)}" alt="${escapeHtml(label)}" loading="lazy" decoding="async" /><span>${escapeHtml(label)}</span></div>`
+    : `<div class="manager-image missing ${className}"><span>${escapeHtml(label)} mangler</span></div>`;
+}
+
+function rimInkOptions(selected, name) {
+  return [["no", "Nei"], ["barely", "Så vidt"], ["yes", "Ja"]].map(([value, label]) => `
+    <label>
+      <input data-manage-field="rim_ink" type="radio" name="${escapeHtml(name)}" value="${value}" ${(selected || "no") === value ? "checked" : ""} />
+      <span>${label}</span>
+    </label>`).join("");
+}
+
+function sortedProducts() {
+  return [...state.products.values()].sort((a, b) => a.id.localeCompare(b.id, "nb", { numeric: true }));
+}
+
+function renderProductManager() {
+  if (!elements.managerList) return;
+  const query = elements.managerSearch.value.trim().toLocaleLowerCase("nb");
+  const products = sortedProducts().filter((product) => {
+    const text = `${product.id} ${product.manufacturer} ${product.model} ${product.plastic || ""} ${statusLabel(product.status)}`.toLocaleLowerCase("nb");
+    return !query || text.includes(query);
+  });
+
+  elements.managerCount.textContent = `${products.length} av ${state.products.size} produkter`;
+  elements.managerList.innerHTML = products.map((product) => `
+    <details class="manager-card" data-manager-id="${escapeHtml(product.id)}">
+      <summary>
+        ${product.image_front
+          ? `<img class="manager-thumb" src="${escapeHtml(product.image_front)}" alt="" loading="lazy" decoding="async" />`
+          : '<span class="manager-thumb missing" aria-hidden="true">–</span>'}
+        <span class="manager-title">
+          <small>Vare ${escapeHtml(product.id)}</small>
+          <strong data-summary-title>${escapeHtml(product.manufacturer)} ${escapeHtml(product.model)}</strong>
+        </span>
+        <span class="status-pill status-${escapeHtml(product.status)}" data-summary-status>${escapeHtml(statusLabel(product.status))}</span>
+        <span class="manager-chevron" aria-hidden="true">⌄</span>
+      </summary>
+      <div class="manager-body">
+        <div class="manager-images">
+          ${managerImage(product.image_front, "Forside", "manager-current-front")}
+          ${managerImage(product.image_back, "Bakside", "manager-current-back")}
+        </div>
+        <div class="manager-form">
+          <div class="field-grid">
+            <label class="field-wide">Produsent
+              <input data-manage-field="manufacturer" list="manufacturer-options" value="${escapeHtml(product.manufacturer)}" required />
+            </label>
+            <label class="field-wide">Modell
+              <input data-manage-field="model" value="${escapeHtml(product.model)}" required />
+            </label>
+            <label>Pris (kr)
+              <input data-manage-field="price" type="number" min="0" step="1" value="${escapeHtml(product.price)}" required />
+            </label>
+            <label>Grad (0–10)
+              <input data-manage-field="grade" type="number" min="0" max="10" step="1" value="${escapeHtml(product.grade)}" required />
+            </label>
+            <label>Vekt (g)
+              <input data-manage-field="weight" type="number" min="1" max="300" step="1" value="${escapeHtml(product.weight ?? "")}" />
+            </label>
+            <label>Plasttype
+              <input data-manage-field="plastic" list="plastic-options" value="${escapeHtml(product.plastic)}" />
+            </label>
+            <fieldset class="field-wide rim-ink-field">
+              <legend>Er det ink i rim?</legend>
+              <div class="segmented-options">${rimInkOptions(product.rim_ink, `manage-rim-${product.id}`)}</div>
+            </fieldset>
+            <label>Status
+              <select data-manage-field="status">${statusOptions(product.status)}</select>
+            </label>
+            <label class="field-full">Merknad
+              <textarea data-manage-field="note" rows="3">${escapeHtml(product.note)}</textarea>
+            </label>
+            <label class="field-wide file-field">Bytt forside <span>Valgfritt – nåværende bilde beholdes hvis feltet er tomt.</span>
+              <input data-manage-image="front" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif" />
+            </label>
+            <label class="field-wide file-field">Bytt bakside <span>Valgfritt – nåværende bilde beholdes hvis feltet er tomt.</span>
+              <input data-manage-image="back" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif" />
+            </label>
+          </div>
+          <div class="manager-save-row">
+            <p class="manager-status" aria-live="polite">Ingen endringer er lagret ennå.</p>
+            <button class="primary-button save-managed-product" type="button">Lagre endringer</button>
+          </div>
+        </div>
+      </div>
+    </details>`).join("");
 }
 
 function renderGroups() {
@@ -359,6 +469,118 @@ async function saveProduct(product) {
   if (!response.ok) throw new Error(await parseError(response, "Kunne ikke lagre produktet."));
   const [saved] = await response.json();
   state.products.set(saved.id, saved);
+  updateDatalists();
+}
+
+function readManagedProduct(card) {
+  const get = (name) => $(`[data-manage-field="${name}"]`, card).value.trim();
+  const product = {
+    manufacturer: get("manufacturer"),
+    model: get("model"),
+    price: Number(get("price")),
+    grade: Number(get("grade")),
+    weight: get("weight") ? Number(get("weight")) : null,
+    plastic: get("plastic") || null,
+    rim_ink: $('[data-manage-field="rim_ink"]:checked', card)?.value || "no",
+    note: get("note") || null,
+    status: get("status"),
+    updated_at: new Date().toISOString(),
+  };
+
+  if (!product.manufacturer || !product.model || !Number.isFinite(product.price) || product.price < 0) {
+    throw new Error("Fyll inn produsent, modell og gyldig pris.");
+  }
+  if (!Number.isInteger(product.grade) || product.grade < 0 || product.grade > 10) {
+    throw new Error("Grad må være et helt tall fra 0 til 10.");
+  }
+  if (product.weight !== null && (!Number.isInteger(product.weight) || product.weight < 1 || product.weight > 300)) {
+    throw new Error("Vekt må være et helt tall mellom 1 og 300 gram.");
+  }
+  return product;
+}
+
+function validateReplacementImage(file) {
+  if (!file) return;
+  if (!/\.(jpe?g|png|webp|avif)$/i.test(file.name)) {
+    throw new Error(`${file.name}: bildet må være JPG, PNG, WebP eller AVIF.`);
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    throw new Error(`${file.name}: bildet er større enn 10 MB.`);
+  }
+}
+
+async function patchManagedProduct(id, changes) {
+  const response = await authenticatedFetch(`/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(changes),
+  });
+  if (!response.ok) throw new Error(await parseError(response, "Kunne ikke lagre endringene."));
+  const [saved] = await response.json();
+  if (!saved) throw new Error("Produktet ble ikke funnet. Last siden på nytt.");
+  state.products.set(saved.id, saved);
+  updateDatalists();
+  return saved;
+}
+
+function replaceManagerImage(card, side, url) {
+  const current = $(`.manager-current-${side}`, card);
+  if (current) current.outerHTML = managerImage(url, side === "front" ? "Forside" : "Bakside", `manager-current-${side}`);
+  if (side === "front") {
+    const thumb = $(".manager-thumb", card);
+    if (thumb) thumb.outerHTML = `<img class="manager-thumb" src="${escapeHtml(url)}" alt="" loading="lazy" decoding="async" />`;
+  }
+}
+
+async function saveManagedProduct(card) {
+  const id = card.dataset.managerId;
+  const button = $(".save-managed-product", card);
+  const status = $(".manager-status", card);
+  button.disabled = true;
+  card.classList.remove("is-error", "is-done");
+  try {
+    const changes = readManagedProduct(card);
+    const frontFile = $('[data-manage-image="front"]', card).files[0];
+    const backFile = $('[data-manage-image="back"]', card).files[0];
+    validateReplacementImage(frontFile);
+    validateReplacementImage(backFile);
+
+    if (frontFile || backFile) status.textContent = "Laster opp nye bilder …";
+    if (frontFile) changes.image_front = await uploadImage(id, "front", frontFile);
+    if (backFile) changes.image_back = await uploadImage(id, "back", backFile);
+
+    status.textContent = "Lagrer endringene …";
+    const saved = await patchManagedProduct(id, changes);
+    $("[data-summary-title]", card).textContent = `${saved.manufacturer} ${saved.model}`;
+    const statusPill = $("[data-summary-status]", card);
+    statusPill.textContent = statusLabel(saved.status);
+    statusPill.className = `status-pill status-${saved.status}`;
+    if (frontFile) replaceManagerImage(card, "front", saved.image_front);
+    if (backFile) replaceManagerImage(card, "back", saved.image_back);
+    $$('[data-manage-image]', card).forEach((input) => { input.value = ""; });
+    card.classList.add("is-done");
+    status.textContent = "Endringene er lagret. Alle andre produktdata og bilder er beholdt.";
+  } catch (error) {
+    card.classList.add("is-error");
+    status.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function setAdminView(view) {
+  const manage = view === "manage";
+  elements.importView.hidden = manage;
+  elements.manageView.hidden = !manage;
+  elements.tabs.forEach((tab) => {
+    const active = tab.dataset.adminView === view;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+  });
+  if (manage) renderProductManager();
 }
 
 async function publishGroup(group, index) {
@@ -473,6 +695,12 @@ elements.editors.addEventListener("click", (event) => {
   if (button) copyPrevious(button.closest(".product-editor"));
 });
 elements.publishAll.addEventListener("click", publishAll);
+elements.tabs.forEach((tab) => tab.addEventListener("click", () => setAdminView(tab.dataset.adminView)));
+elements.managerSearch.addEventListener("input", renderProductManager);
+elements.managerList.addEventListener("click", (event) => {
+  const button = event.target.closest(".save-managed-product");
+  if (button) saveManagedProduct(button.closest(".manager-card"));
+});
 
 if (state.session) {
   openWorkspace().catch((error) => {

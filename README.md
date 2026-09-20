@@ -36,6 +36,8 @@ Den innloggede administrasjonssiden ligger på `admin.html`. Den grupperer autom
 
 Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype, eventuell ink i rim og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
 
+Fanen **Administrer produkter** viser alle eksisterende varer fra Supabase. Der kan produktinformasjon, status og enkeltbilder oppdateres uten å laste opp hele bildeparet på nytt. Redigeringen bruker feltvise oppdateringer, så bilder og databaseverdier som ikke endres, beholdes.
+
 Første gangs oppsett:
 
 1. Kjør siste versjon av `supabase/schema.sql` i SQL Editor.

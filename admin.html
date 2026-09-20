@@ -35,41 +35,68 @@
       </section>
 
       <section class="workspace" id="workspace" hidden>
-        <div class="intro">
-          <div>
-            <p class="eyebrow">Produktimport</p>
-            <h1>Last opp alle bildene på én gang</h1>
+        <nav class="admin-tabs" aria-label="Administrasjon">
+          <button class="active" type="button" data-admin-view="import" aria-selected="true">Last opp varer</button>
+          <button type="button" data-admin-view="manage" aria-selected="false">Administrer produkter</button>
+        </nav>
+
+        <section class="admin-view" id="import-view">
+          <div class="intro">
+            <div>
+              <p class="eyebrow">Produktimport</p>
+              <h1>Last opp alle bildene på én gang</h1>
+            </div>
+            <p>Navngi dem <strong>001_f</strong> og <strong>001_b</strong>. Vi kobler forside og bakside sammen og spør hva hvert produkt er.</p>
           </div>
-          <p>Navngi dem <strong>001_f</strong> og <strong>001_b</strong>. Vi kobler forside og bakside sammen og spør hva hvert produkt er.</p>
-        </div>
 
-        <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-controls="file-input">
-          <input id="file-input" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif" hidden />
-          <span class="drop-icon" aria-hidden="true">＋</span>
-          <strong>Dra bildene hit</strong>
-          <span>eller klikk for å velge filer</span>
-          <small>JPG, PNG, WebP eller AVIF · maks 10 MB per bilde</small>
-        </div>
-
-        <div class="import-summary" id="import-summary" hidden>
-          <div>
-            <strong id="group-count"></strong>
-            <span id="file-count"></span>
+          <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-controls="file-input">
+            <input id="file-input" type="file" multiple accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif" hidden />
+            <span class="drop-icon" aria-hidden="true">＋</span>
+            <strong>Dra bildene hit</strong>
+            <span>eller klikk for å velge filer</span>
+            <small>JPG, PNG, WebP eller AVIF · maks 10 MB per bilde</small>
           </div>
-          <button class="secondary-button" id="choose-again" type="button">Velg bilder på nytt</button>
-        </div>
 
-        <div class="file-errors" id="file-errors" hidden aria-live="polite"></div>
-        <div class="product-editors" id="product-editors"></div>
-
-        <div class="publish-bar" id="publish-bar" hidden>
-          <div class="publish-progress">
-            <strong id="publish-title">Klar til opplasting</strong>
-            <span id="publish-detail">Kontroller produktinformasjonen først.</span>
-            <progress id="publish-progress" value="0" max="1"></progress>
+          <div class="import-summary" id="import-summary" hidden>
+            <div>
+              <strong id="group-count"></strong>
+              <span id="file-count"></span>
+            </div>
+            <button class="secondary-button" id="choose-again" type="button">Velg bilder på nytt</button>
           </div>
-          <button class="primary-button" id="publish-all" type="button">Last opp og lagre</button>
-        </div>
+
+          <div class="file-errors" id="file-errors" hidden aria-live="polite"></div>
+          <div class="product-editors" id="product-editors"></div>
+
+          <div class="publish-bar" id="publish-bar" hidden>
+            <div class="publish-progress">
+              <strong id="publish-title">Klar til opplasting</strong>
+              <span id="publish-detail">Kontroller produktinformasjonen først.</span>
+              <progress id="publish-progress" value="0" max="1"></progress>
+            </div>
+            <button class="primary-button" id="publish-all" type="button">Last opp og lagre</button>
+          </div>
+        </section>
+
+        <section class="admin-view" id="manage-view" hidden>
+          <div class="intro manage-intro">
+            <div>
+              <p class="eyebrow">Produktoversikt</p>
+              <h1>Administrer produkter</h1>
+            </div>
+            <p>Rediger produktinformasjon eller bytt ett bilde om gangen. Eksisterende bilder og verdier beholdes dersom du ikke endrer dem.</p>
+          </div>
+
+          <div class="manager-tools">
+            <label class="manager-search">
+              <span>Søk i produktene</span>
+              <input id="manager-search" type="search" placeholder="Varenummer, produsent, modell eller status" autocomplete="off" />
+            </label>
+            <strong id="manager-count"></strong>
+          </div>
+
+          <div class="manager-list" id="manager-list"></div>
+        </section>
       </section>
     </main>
 
