@@ -103,11 +103,11 @@ function fromDatabaseProduct(row) {
 }
 
 function supabaseHeaders() {
-  return { apikey: config.supabaseAnonKey, Authorization: `Bearer ${config.supabaseAnonKey}`, "Content-Type": "application/json" };
+  return { apikey: config.supabasePublishableKey, "Content-Type": "application/json" };
 }
 
 function isSupabaseReady() {
-  return Boolean(config.supabaseUrl && config.supabaseAnonKey);
+  return Boolean(config.supabaseUrl && config.supabasePublishableKey);
 }
 
 function populateManufacturerFilter() {

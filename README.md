@@ -46,7 +46,7 @@ Skriptet kontrollerer varenummer, produktnavn og grad, og kobler bildene til rik
 
 1. Opprett et Supabase-prosjekt.
 2. Kjør `supabase/schema.sql` i SQL Editor.
-3. Kopier Project URL og den offentlige anon-nøkkelen til `config.js`.
+3. Kopier Project URL og den offentlige publishable-nøkkelen til `config.js`.
 4. Legg de virkelige produktene i `products`-tabellen.
 
 `reserve_order()` låser alle valgte produkter i samme databasetransaksjon. Kunden får enten reservert hele kurven eller ingen av varene. Personopplysninger kan ikke leses med den offentlige nøkkelen.
