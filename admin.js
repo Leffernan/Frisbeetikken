@@ -205,7 +205,7 @@ function preview(file, alt) {
   if (!file) return `<div class="image-preview missing"><span>${escapeHtml(alt)}</span></div>`;
   const url = URL.createObjectURL(file);
   state.objectUrls.push(url);
-  return `<div class="image-preview"><img src="${url}" alt="${escapeHtml(alt)}" /><span>${escapeHtml(alt)}</span></div>`;
+  return `<div class="image-preview"><img src="${url}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" /><span>${escapeHtml(alt)}</span></div>`;
 }
 
 function statusOptions(selected) {
