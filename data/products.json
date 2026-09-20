@@ -1,0 +1,172 @@
+[
+  {
+    "id": "001",
+    "manufacturer": "Innova",
+    "model": "Destroyer",
+    "price": 179,
+    "grade": 9,
+    "weight": 173,
+    "plastic": "Star",
+    "note": "Svært pen disc med minimale bruksspor.",
+    "createdAt": "2026-09-20T15:40:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#f06c4f"
+  },
+  {
+    "id": "002",
+    "manufacturer": "Kastaplast",
+    "model": "Berg",
+    "price": 149,
+    "grade": 8,
+    "weight": 175,
+    "plastic": "K1 Soft",
+    "note": "Normal bruk. Ingen navn eller telefonnummer skrevet på.",
+    "createdAt": "2026-09-19T12:00:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#dfc760"
+  },
+  {
+    "id": "003",
+    "manufacturer": "Latitude 64°",
+    "model": "River",
+    "price": 129,
+    "grade": 7,
+    "weight": 171,
+    "plastic": "Opto",
+    "note": "Noen riper i flightplaten, men fin kant.",
+    "createdAt": "2026-09-18T16:30:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#58a7b4"
+  },
+  {
+    "id": "004",
+    "manufacturer": "Discmania",
+    "model": "P2",
+    "price": 99,
+    "grade": 6,
+    "weight": 176,
+    "plastic": "D-Line",
+    "note": "Godt innspilt putter med jevn slitasje.",
+    "createdAt": "2026-09-17T09:15:00Z",
+    "status": "reserved",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#d8d2bf"
+  },
+  {
+    "id": "005",
+    "manufacturer": "MVP",
+    "model": "Hex",
+    "price": 199,
+    "grade": 10,
+    "weight": 177,
+    "plastic": "Neutron",
+    "note": "Som ny. Kun prøveflydd på gress.",
+    "createdAt": "2026-09-16T18:00:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#b77bd2"
+  },
+  {
+    "id": "006",
+    "manufacturer": "Prodigy",
+    "model": "PA-3",
+    "price": 119,
+    "grade": 7,
+    "weight": 174,
+    "plastic": "300 Soft",
+    "note": "Innspilt og gripevennlig. Initialer skrevet under.",
+    "createdAt": "2026-09-15T14:45:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#ee91a6"
+  },
+  {
+    "id": "007",
+    "manufacturer": "Innova",
+    "model": "Mako3",
+    "price": 159,
+    "grade": 8,
+    "weight": 180,
+    "plastic": "Champion",
+    "note": "Pen midrange med noen lette riper.",
+    "createdAt": "2026-09-14T11:20:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#74aee6"
+  },
+  {
+    "id": "008",
+    "manufacturer": "Westside",
+    "model": "Harp",
+    "price": 139,
+    "grade": 8,
+    "weight": 176,
+    "plastic": "VIP",
+    "note": "Stabil approach-disc i svært god stand.",
+    "createdAt": "2026-09-13T08:00:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#f2a454"
+  },
+  {
+    "id": "009",
+    "manufacturer": "Kastaplast",
+    "model": "Falk",
+    "price": 169,
+    "grade": 9,
+    "weight": 172,
+    "plastic": "K1",
+    "note": "Svært pen fairwaydriver uten merking.",
+    "createdAt": "2026-09-12T19:10:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#7fc9a2"
+  },
+  {
+    "id": "010",
+    "manufacturer": "Latitude 64°",
+    "model": "Diamond",
+    "price": 109,
+    "grade": 6,
+    "weight": 156,
+    "plastic": "Gold",
+    "note": "Lett og lettkastet. Synlige, men kosmetiske bruksspor.",
+    "createdAt": "2026-09-11T13:25:00Z",
+    "status": "available",
+    "images": {
+      "front": "",
+      "back": ""
+    },
+    "color": "#e8dd91"
+  }
+]

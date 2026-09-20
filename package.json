@@ -1,0 +1,11 @@
+{
+  "name": "frisbeetikken",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:images": "node scripts/sync-product-images.mjs",
+    "check": "node --check app.js && node scripts/validate-products.mjs",
+    "serve": "python3 -m http.server 4173"
+  }
+}
