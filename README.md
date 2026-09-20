@@ -25,7 +25,7 @@ npm run serve
 
 ## Legg til produkter
 
-Produktinformasjonen ligger i `data/products.json`. Hver fysisk disc skal ha et unikt varenummer.
+Produktinformasjonen ligger i `data/products.json`. Hver fysisk disk skal ha et unikt varenummer.
 
 Legg bildene i `assets/products/` med dette formatet:
 

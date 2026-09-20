@@ -9,10 +9,9 @@
       content="Frisbeetikken – håndplukkede brukte disker, gradert og fotografert enkeltvis."
     />
     <title>Frisbeetikken</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+      href="https://cdn.jsdelivr.net/npm/@fontsource-variable/mona-sans/index.css"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
@@ -25,7 +24,7 @@
         <span class="brand-mark" aria-hidden="true">
           <span></span><span></span><span></span>
         </span>
-        <span class="brand-word"><span class="brand-soft">Fris</span><span class="brand-strong">beetikken</span></span>
+        <span class="brand-word"><span class="brand-soft">FRIS</span><span class="brand-strong">BEETIKKEN</span></span>
       </a>
       <button class="cart-button" id="open-cart" type="button" aria-controls="cart-drawer">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -39,16 +38,17 @@
     <main>
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">Én av hver. Akkurat som kastet ditt.</p>
           <h1 id="hero-title">Brukte disker.<br /><em>Nye muligheter.</em></h1>
           <p>
-            Hver disc er fotografert, vurdert og gradert enkeltvis. Du ser nøyaktig hva du kjøper –
-            og gir en god disc en ny runde.
+            Hver disk er fotografert, vurdert og gradert enkeltvis. Du ser nøyaktig hva du kjøper –
+            og gir en god disk en ny runde.
           </p>
           <a class="hero-link" href="#products">Se alle disker <span aria-hidden="true">↓</span></a>
         </div>
         <div class="hero-art" aria-hidden="true">
-          <div class="flight-line"></div>
+          <svg class="flight-line" viewBox="0 0 720 300" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M8 230 C178 45 390 43 682 159 L682 211 C394 77 184 70 8 239 Z" />
+          </svg>
           <div class="hero-disc">
             <span class="disc-brand"><small>FRIS</small><strong>BEETIKKEN</strong></span>
           </div>
@@ -67,11 +67,11 @@
 
         <div class="shop-tools" aria-label="Søk, filtrering og sortering">
           <label class="search-field">
-            <span class="sr-only">Søk etter disc eller produsent</span>
+            <span class="sr-only">Søk etter disk eller produsent</span>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path>
             </svg>
-            <input id="search" type="search" placeholder="Søk etter disc eller produsent" autocomplete="off" />
+            <input id="search" type="search" placeholder="Søk etter disk eller produsent" autocomplete="off" />
           </label>
 
           <label class="select-field">
@@ -132,7 +132,7 @@
 
     <footer>
       <a class="brand brand-footer" href="#">
-        <span class="brand-word"><span class="brand-soft">Fris</span><span class="brand-strong">beetikken</span></span>
+        <span class="brand-word"><span class="brand-soft">FRIS</span><span class="brand-strong">BEETIKKEN</span></span>
       </a>
       <p>Brukte disker. Ærlig gradert. Klar for nye kast.</p>
       <p class="footer-small">© <span id="year"></span> Frisbeetikken</p>
@@ -152,7 +152,7 @@
       <div class="cart-empty" id="cart-empty">
         <div class="mini-disc" aria-hidden="true"></div>
         <h3>Handlekurven er tom</h3>
-        <p>Hver disc finnes bare i ett eksemplar.</p>
+        <p>Hver disk finnes bare i ett eksemplar.</p>
       </div>
       <div class="cart-summary" id="cart-summary" hidden>
         <div><span>Antall disker</span><strong id="cart-quantity"></strong></div>

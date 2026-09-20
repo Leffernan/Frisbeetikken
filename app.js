@@ -39,19 +39,19 @@ function placeholderImage(product, side = "front") {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 700">
       <defs>
-        <radialGradient id="bg"><stop offset="0" stop-color="#f9f7f0"/><stop offset="1" stop-color="#dedbd1"/></radialGradient>
-        <radialGradient id="disc"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".45" stop-color="${escapeXml(product.color || "#d4ef57")}"/><stop offset="1" stop-color="#10251f" stop-opacity=".18"/></radialGradient>
+        <radialGradient id="bg"><stop offset="0" stop-color="#f4f4ed"/><stop offset="1" stop-color="#dde1d2"/></radialGradient>
+        <radialGradient id="disc"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".45" stop-color="${escapeXml(product.color || "#d2ff00")}"/><stop offset="1" stop-color="#111112" stop-opacity=".18"/></radialGradient>
         <filter id="s"><feDropShadow dx="10" dy="20" stdDeviation="18" flood-opacity=".22"/></filter>
       </defs>
       <rect width="700" height="700" fill="url(#bg)"/>
       <g transform="rotate(${rotation} 350 350)" filter="url(#s)">
-        <ellipse cx="350" cy="365" rx="265" ry="252" fill="#10251f" opacity=".15"/>
+        <ellipse cx="350" cy="365" rx="265" ry="252" fill="#111112" opacity=".15"/>
         <circle cx="350" cy="335" r="258" fill="url(#disc)" stroke="#fff" stroke-opacity=".35" stroke-width="7"/>
-        <circle cx="350" cy="335" r="207" fill="none" stroke="#10251f" stroke-opacity=".2" stroke-width="3"/>
-        <circle cx="350" cy="335" r="175" fill="none" stroke="#10251f" stroke-opacity=".18" stroke-width="2" stroke-dasharray="8 10"/>
-        <text x="350" y="316" fill="#10251f" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" letter-spacing="4">${escapeXml(sub.toUpperCase())}</text>
-        <text x="350" y="369" fill="#10251f" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="800">${escapeXml(label.toUpperCase())}</text>
-        <text x="350" y="407" fill="#10251f" fill-opacity=".72" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="3">FRISBEETIKKEN</text>
+        <circle cx="350" cy="335" r="207" fill="none" stroke="#111112" stroke-opacity=".2" stroke-width="3"/>
+        <circle cx="350" cy="335" r="175" fill="none" stroke="#111112" stroke-opacity=".18" stroke-width="2" stroke-dasharray="8 10"/>
+        <text x="350" y="316" fill="#111112" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" letter-spacing="4">${escapeXml(sub.toUpperCase())}</text>
+        <text x="350" y="369" fill="#111112" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="800">${escapeXml(label.toUpperCase())}</text>
+        <text x="350" y="407" fill="#111112" fill-opacity=".72" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="3">FRISBEETIKKEN</text>
       </g>
     </svg>`;
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
@@ -118,11 +118,11 @@ function fromDatabaseProduct(row) {
     grade: Number(row.grade),
     weight: row.weight,
     plastic: row.plastic,
-    note: row.note,
+    note: row.note?.replace(/\bdisc\b/gi, "disk"),
     createdAt: row.created_at,
     status: row.status,
     images: { front: row.image_front || "", back: row.image_back || "" },
-    color: row.color || "#d4ef57",
+    color: row.color || "#d2ff00",
   };
 }
 
@@ -166,7 +166,7 @@ function visibleProducts() {
 function renderProducts() {
   const products = visibleProducts();
   elements.grid.innerHTML = "";
-  elements.count.textContent = `${products.length} ${products.length === 1 ? "disc" : "disker"}`;
+  elements.count.textContent = `${products.length} ${products.length === 1 ? "disk" : "disker"}`;
   elements.empty.hidden = products.length !== 0;
 
   for (const product of products) {

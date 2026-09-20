@@ -92,7 +92,7 @@ begin
 
   select count(distinct item) into requested_count from unnest(product_ids) item;
 
-  -- FOR UPDATE gjør at to samtidige kunder ikke kan reservere samme disc.
+  -- FOR UPDATE gjør at to samtidige kunder ikke kan reservere samme disk.
   perform id
   from public.products
   where id = any(product_ids)
@@ -177,7 +177,7 @@ revoke all on function public.release_expired_reservations() from public;
 -- Eksempelprodukter. Fjern blokken hvis du vil starte med tom butikk.
 insert into public.products (id, manufacturer, model, price, grade, weight, plastic, note, color, status, created_at)
 values
-  ('001', 'Innova', 'Destroyer', 179, 9, 173, 'Star', 'Svært pen disc med minimale bruksspor.', '#f06c4f', 'available', now()),
+  ('001', 'Innova', 'Destroyer', 179, 9, 173, 'Star', 'Svært pen disk med minimale bruksspor.', '#f06c4f', 'available', now()),
   ('002', 'Kastaplast', 'Berg', 149, 8, 175, 'K1 Soft', 'Normal bruk. Ingen navn eller telefonnummer skrevet på.', '#dfc760', 'available', now() - interval '1 day'),
   ('003', 'Latitude 64°', 'River', 129, 7, 171, 'Opto', 'Noen riper i flightplaten, men fin kant.', '#58a7b4', 'available', now() - interval '2 days')
 on conflict (id) do nothing;
