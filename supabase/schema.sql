@@ -46,11 +46,19 @@ create table if not exists public.orders (
   customer_phone text not null,
   delivery_method text not null check (delivery_method = 'pickup'),
   customer_note text,
+  items jsonb not null default '[]'::jsonb,
+  total numeric(10, 2) not null default 0 check (total >= 0),
   status text not null default 'reserved' check (status in ('reserved', 'confirmed', 'sold', 'cancelled', 'expired')),
   reserved_until timestamptz not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Varslingsfeltene gjør at en webhook får med varer og totalsum uten tilgang
+-- til private tabeller eller en service role-nøkkel.
+alter table public.orders
+  add column if not exists items jsonb not null default '[]'::jsonb,
+  add column if not exists total numeric(10, 2) not null default 0;
 
 create table if not exists public.order_items (
   order_id uuid not null references public.orders(id) on delete cascade,
@@ -193,6 +201,8 @@ declare
   new_order_number text;
   requested_count integer;
   available_count integer;
+  order_items_snapshot jsonb;
+  order_total numeric(10, 2);
 begin
   if coalesce(array_length(product_ids, 1), 0) = 0 then
     raise exception 'Handlekurven er tom';
@@ -225,11 +235,23 @@ begin
     raise exception 'En eller flere disker er ikke lenger tilgjengelige';
   end if;
 
+  select
+    coalesce(jsonb_agg(jsonb_build_object(
+      'id', p.id,
+      'manufacturer', p.manufacturer,
+      'model', p.model,
+      'price', p.price
+    ) order by p.id), '[]'::jsonb),
+    coalesce(sum(p.price), 0)
+  into order_items_snapshot, order_total
+  from public.products p
+  where p.id = any(product_ids);
+
   new_order_number := 'FT-' || to_char(now(), 'YYMMDD') || '-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6));
 
   insert into public.orders (
     order_number, customer_name, customer_email, customer_phone,
-    delivery_method, customer_note, reserved_until
+    delivery_method, customer_note, items, total, reserved_until
   ) values (
     new_order_number,
     left(trim(customer_name), 120),
@@ -237,6 +259,8 @@ begin
     left(trim(customer_phone), 40),
     delivery_method,
     left(customer_note, 1000),
+    order_items_snapshot,
+    order_total,
     now() + interval '48 hours'
   ) returning id into new_order_id;
 
@@ -252,6 +276,7 @@ begin
   return jsonb_build_object(
     'order_id', new_order_id,
     'order_number', new_order_number,
+    'total', order_total,
     'reserved_until', now() + interval '48 hours'
   );
 end;

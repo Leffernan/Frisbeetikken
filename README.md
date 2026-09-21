@@ -57,17 +57,19 @@ Den gamle lokale bildeimporten i `assets/products/` finnes fortsatt for utviklin
 
 `reserve_order()` låser alle valgte produkter i samme databasetransaksjon. Kunden får enten reservert hele kurven eller ingen av varene. Personopplysninger kan ikke leses med den offentlige nøkkelen.
 
-### Send nye bestillinger på e-post
+### Send nye reservasjoner til Gmail uten eget domene
 
-`supabase/functions/order-email/` inneholder en ferdig Edge Function for Resend:
+`notifications/google-apps-script/Code.gs` er et ferdig Google Apps Script som mottar en Supabase-webhook og sender en e-post fra Google-kontoen til `leffernan@gmail.com`.
 
-1. Opprett en Resend-konto og verifiser avsenderdomenet.
-2. Deploy funksjonen `order-email` i Supabase.
-3. Legg inn secrets: `RESEND_API_KEY`, `ORDER_EMAIL=leffernan@gmail.com`, `EMAIL_FROM` og en tilfeldig `WEBHOOK_SECRET`.
-4. Opprett en Supabase Database Webhook på `INSERT` i `public.orders` og pek den mot funksjonen.
-5. Legg samme verdi som `WEBHOOK_SECRET` i webhook-headeren `x-webhook-secret`.
+1. Kjør migrasjonen `supabase/migrations/20260921_reservations_and_ink.sql` i Supabase SQL Editor.
+2. Opprett et nytt prosjekt på `script.google.com` og lim inn innholdet i `Code.gs`.
+3. Under **Project Settings → Script Properties**, legg inn `ORDER_EMAIL` med verdien `leffernan@gmail.com` og `WEBHOOK_SECRET` med en lang, tilfeldig verdi.
+4. Velg **Deploy → New deployment → Web app**, kjør som deg selv og gi tilgang til **Anyone**. Godkjenn Gmail-tilgangen og kopier URL-en som slutter på `/exec`.
+5. Opprett en Supabase Database Webhook for `INSERT` på `public.orders`. Bruk webapp-URL-en med `?token=DIN_WEBHOOK_SECRET` på slutten.
 
-Mottakeradresse og nøkler ligger dermed aldri i det offentlige repoet. E-posten inneholder kundeinfo, leveringsvalg, valgte disker og totalpris.
+Webhooken inneholder kundeinfo, valgte disker og totalsum. Scriptet kontrollerer den hemmelige verdien før det sender e-post. En vanlig Gmail-konto kan sende til opptil 100 mottakere per døgn gjennom Apps Script.
+
+Den alternative Resend-funksjonen ligger fortsatt i `supabase/functions/order-email/`, men krever et verifisert avsenderdomene.
 
 ## GitHub Pages
 

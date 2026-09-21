@@ -17,6 +17,10 @@ alter table public.products
   add constraint products_rim_ink_check
   check (rim_ink in ('no', 'under_barely', 'rim_barely', 'rim', 'under'));
 
+alter table public.orders
+  add column if not exists items jsonb not null default '[]'::jsonb,
+  add column if not exists total numeric(10, 2) not null default 0;
+
 create or replace function public.reserve_order(
   product_ids text[],
   customer_name text,
@@ -35,6 +39,8 @@ declare
   new_order_number text;
   requested_count integer;
   available_count integer;
+  order_items_snapshot jsonb;
+  order_total numeric(10, 2);
 begin
   if coalesce(array_length(product_ids, 1), 0) = 0 then
     raise exception 'Handlekurven er tom';
@@ -66,11 +72,23 @@ begin
     raise exception 'En eller flere disker er ikke lenger tilgjengelige';
   end if;
 
+  select
+    coalesce(jsonb_agg(jsonb_build_object(
+      'id', p.id,
+      'manufacturer', p.manufacturer,
+      'model', p.model,
+      'price', p.price
+    ) order by p.id), '[]'::jsonb),
+    coalesce(sum(p.price), 0)
+  into order_items_snapshot, order_total
+  from public.products p
+  where p.id = any(product_ids);
+
   new_order_number := 'FT-' || to_char(now(), 'YYMMDD') || '-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6));
 
   insert into public.orders (
     order_number, customer_name, customer_email, customer_phone,
-    delivery_method, customer_note, reserved_until
+    delivery_method, customer_note, items, total, reserved_until
   ) values (
     new_order_number,
     left(trim(customer_name), 120),
@@ -78,6 +96,8 @@ begin
     left(trim(customer_phone), 40),
     delivery_method,
     left(customer_note, 1000),
+    order_items_snapshot,
+    order_total,
     now() + interval '48 hours'
   ) returning id into new_order_id;
 
@@ -93,6 +113,7 @@ begin
   return jsonb_build_object(
     'order_id', new_order_id,
     'order_number', new_order_number,
+    'total', order_total,
     'reserved_until', now() + interval '48 hours'
   );
 end;
