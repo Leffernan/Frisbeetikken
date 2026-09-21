@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "Brier";
+  src: url("./assets/fonts/Brier-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Brier";
+  src: url("./assets/fonts/Brier-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   --ink: #111112;
   --forest: #282c20;
@@ -77,7 +93,7 @@ img { display: block; max-width: 100%; }
 }
 .brand-word { display: inline-flex; letter-spacing: -1.1px; }
 .brand-soft { color: var(--brand-soft); font-weight: 600; }
-.brand-strong { color: var(--brand-strong); font-weight: 700; }
+.brand-strong { color: var(--brand-strong); font-family: "Brier", "Mona Sans Variable", Arial, sans-serif; font-weight: 700; letter-spacing: .01em; }
 .brand-mark {
   position: relative;
   display: block;
@@ -171,6 +187,12 @@ img { display: block; max-width: 100%; }
   color: var(--lime);
   font-style: normal;
 }
+.brier-word {
+  font-family: "Brier", "Mona Sans Variable", Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+}
 .hero-copy > p:not(.eyebrow) {
   max-width: 590px;
   margin: 30px 0 34px;
@@ -229,6 +251,7 @@ img { display: block; max-width: 100%; }
 }
 .hero-disc .disc-brand strong {
   color: var(--ink);
+  font-family: "Brier", "Mona Sans Variable", Arial, sans-serif;
   font-size: clamp(21px, 3vw, 42px);
   font-weight: 700;
   letter-spacing: -2px;

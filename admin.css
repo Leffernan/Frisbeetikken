@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Brier";
+  src: url("./assets/fonts/Brier-Bold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   --ink: #111112;
   --forest: #282c20;
@@ -39,7 +47,7 @@ button { color: inherit; }
 }
 .brand { display: inline-flex; color: inherit; font-size: 25px; font-weight: 700; letter-spacing: -1.3px; text-decoration: none; }
 .brand-soft { color: var(--soft); font-weight: 600; }
-.brand-strong { color: var(--lime); }
+.brand-strong { color: var(--lime); font-family: "Brier", "Mona Sans Variable", Arial, sans-serif; letter-spacing: .01em; }
 .session-actions { display: flex; align-items: center; gap: 16px; color: var(--cream); font-size: 14px; }
 .text-button { padding: 0; color: inherit; background: none; border: 0; font-weight: 700; text-decoration: underline; cursor: pointer; }
 main { width: min(1440px, 100%); margin: 0 auto; padding: clamp(36px, 6vw, 84px) clamp(16px, 4vw, 60px) 150px; }
