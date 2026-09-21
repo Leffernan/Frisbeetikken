@@ -92,7 +92,7 @@ img { display: block; max-width: 100%; }
   text-decoration: none;
 }
 .brand-word { display: inline-flex; letter-spacing: -1.1px; }
-.brand-soft { color: var(--brand-soft); font-family: "Mona Sans Variable", Arial, sans-serif; font-weight: 600; }
+.brand-soft { color: var(--paper); font-family: "Mona Sans Variable", Arial, sans-serif; font-weight: 600; }
 .brand-strong { color: var(--brand-strong); font-family: "Brier", "Mona Sans Variable", Arial, sans-serif; font-weight: 700; letter-spacing: .01em; }
 .brand-mark {
   position: relative;
@@ -478,7 +478,7 @@ footer {
   color: #dde1d2;
   background: #111112;
 }
-.brand-footer .brand-soft { color: #b4b8a5; }
+.brand-footer .brand-soft { color: var(--paper); }
 .brand-footer .brand-strong { color: var(--brand-strong); }
 footer p { margin: 0; }
 .footer-small { color: #b4b8a5; font-size: 13px; }
