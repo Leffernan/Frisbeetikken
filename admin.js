@@ -3,6 +3,13 @@ import { config } from "./config.js";
 const BUCKET = "product-images";
 const SESSION_KEY = "frisbeetikken-admin-session";
 const IMAGE_PATTERN = /^(\d+)[_-]([fb])\.(jpe?g|png|webp|avif)$/i;
+const RIM_INK_OPTIONS = [
+  ["no", "Nei"],
+  ["under_barely", "Ja - så vidt under"],
+  ["rim_barely", "Ja - så vidt i rim"],
+  ["rim", "Ja - i rim"],
+  ["under", "Ja - under"],
+];
 
 const state = {
   session: readSession(),
@@ -253,10 +260,12 @@ function managerImage(url, label, className = "") {
     : `<div class="manager-image missing ${className}"><span>${escapeHtml(label)} mangler</span></div>`;
 }
 
-function rimInkOptions(selected, name) {
-  return [["no", "Nei"], ["barely", "Så vidt"], ["yes", "Ja"]].map(([value, label]) => `
+function rimInkOptions(selected, name, field = "manage") {
+  const normalized = ({ barely: "rim_barely", yes: "rim" })[selected] || selected || "no";
+  const attribute = field === "import" ? "data-field" : "data-manage-field";
+  return RIM_INK_OPTIONS.map(([value, label]) => `
     <label>
-      <input data-manage-field="rim_ink" type="radio" name="${escapeHtml(name)}" value="${value}" ${(selected || "no") === value ? "checked" : ""} />
+      <input ${attribute}="rim_ink" type="radio" name="${escapeHtml(name)}" value="${value}" ${normalized === value ? "checked" : ""} />
       <span>${label}</span>
     </label>`).join("");
 }
@@ -312,8 +321,8 @@ function renderProductManager() {
             <label>Plasttype
               <input data-manage-field="plastic" list="plastic-options" value="${escapeHtml(product.plastic)}" />
             </label>
-            <fieldset class="field-wide rim-ink-field">
-              <legend>Er det ink i rim?</legend>
+            <fieldset class="field-full rim-ink-field">
+              <legend>Er det ink?</legend>
               <div class="segmented-options">${rimInkOptions(product.rim_ink, `manage-rim-${product.id}`)}</div>
             </fieldset>
             <label>Status
@@ -385,17 +394,9 @@ function renderGroups() {
             <label>Plasttype
               <input data-field="plastic" list="plastic-options" value="${escapeHtml(product.plastic)}" />
             </label>
-            <fieldset class="field-wide rim-ink-field">
-              <legend>Er det ink i rim?</legend>
-              <div class="segmented-options">
-                ${[
-                  ["no", "Nei"], ["barely", "Så vidt"], ["yes", "Ja"],
-                ].map(([value, label]) => `
-                  <label>
-                    <input data-field="rim_ink" type="radio" name="rim-ink-${escapeHtml(group.id)}" value="${value}" ${(product.rim_ink || "no") === value ? "checked" : ""} />
-                    <span>${label}</span>
-                  </label>`).join("")}
-              </div>
+            <fieldset class="field-full rim-ink-field">
+              <legend>Er det ink?</legend>
+              <div class="segmented-options">${rimInkOptions(product.rim_ink, `rim-ink-${group.id}`, "import")}</div>
             </fieldset>
             <label>Status
               <select data-field="status">${statusOptions(product.status || "available")}</select>

@@ -61,7 +61,7 @@
         <div class="shop-heading">
           <div>
             <p class="eyebrow">Alle disker</p>
-            <h2 id="products-title">Finn din neste <span class="brier-word">favoritt</span></h2>
+            <h2 id="products-title">Finn din nye <span class="brier-word favorite-box">favoritt</span></h2>
           </div>
           <p class="result-count" id="result-count" aria-live="polite"></p>
         </div>
@@ -183,15 +183,11 @@
         <label>Navn <input name="name" required autocomplete="name" /></label>
         <label>E-post <input name="email" type="email" required autocomplete="email" /></label>
         <label>Telefon <input name="phone" type="tel" required autocomplete="tel" /></label>
-        <label>
-          Levering
-          <select name="delivery" required>
-            <option value="">Velg leveringsmåte</option>
-            <option value="pickup">Hentes etter avtale</option>
-            <option value="posten">Sendes med Posten</option>
-            <option value="postnord">Sendes med PostNord</option>
-          </select>
-        </label>
+        <div class="delivery-choice">
+          <span>Levering</span>
+          <strong>Hentes etter avtale</strong>
+          <input name="delivery" type="hidden" value="pickup" />
+        </div>
         <label class="full-width">Merknad <textarea name="note" rows="3" placeholder="Valgfritt"></textarea></label>
         <label class="consent full-width">
           <input name="consent" type="checkbox" required />

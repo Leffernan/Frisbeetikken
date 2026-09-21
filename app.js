@@ -128,7 +128,15 @@ function fromDatabaseProduct(row) {
 }
 
 function rimInkLabel(value) {
-  return ({ no: "Nei", barely: "Så vidt", yes: "Ja" })[value] || "Nei";
+  return ({
+    no: "Nei",
+    under_barely: "Ja - så vidt under",
+    rim_barely: "Ja - så vidt i rim",
+    rim: "Ja - i rim",
+    under: "Ja - under",
+    barely: "Ja - så vidt i rim",
+    yes: "Ja - i rim",
+  })[value] || "Nei";
 }
 
 function supabaseHeaders() {
@@ -221,7 +229,7 @@ function openProduct(product) {
           <div><span>Grad</span><strong>${product.grade}/10</strong></div>
           <div><span>Vekt</span><strong>${product.weight ? `${product.weight} g` : "–"}</strong></div>
           <div><span>Plast</span><strong>${escapeXml(product.plastic || "–")}</strong></div>
-          <div><span>Ink i rim</span><strong>${rimInkLabel(product.rimInk)}</strong></div>
+          <div><span>Ink</span><strong>${rimInkLabel(product.rimInk)}</strong></div>
         </div>
         <p class="detail-note">${escapeXml(product.note || "Ingen merknader registrert.")}</p>
         <p class="detail-number">Varenummer ${escapeXml(product.id)}</p>

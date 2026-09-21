@@ -34,7 +34,7 @@ Den innloggede administrasjonssiden ligger på `admin.html`. Den grupperer autom
 002_b.jpg
 ```
 
-Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype, eventuell ink i rim og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
+Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype, eventuell ink og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
 
 Fanen **Administrer produkter** viser alle eksisterende varer fra Supabase. Der kan produktinformasjon, status og enkeltbilder oppdateres uten å laste opp hele bildeparet på nytt. Redigeringen bruker feltvise oppdateringer, så bilder og databaseverdier som ikke endres, beholdes. Sletting krever at varenummeret skrives inn som bekreftelse og kan angres i 20 sekunder; bildefilene beholdes i Storage som ekstra sikkerhet.
 
@@ -51,7 +51,7 @@ Den gamle lokale bildeimporten i `assets/products/` finnes fortsatt for utviklin
 ## Aktiver reservasjoner
 
 1. Opprett et Supabase-prosjekt.
-2. Kjør `supabase/schema.sql` i SQL Editor.
+2. Kjør `supabase/schema.sql` i SQL Editor. For et eksisterende Frisbeetikken-prosjekt kan den målrettede filen `supabase/migrations/20260921_reservations_and_ink.sql` kjøres i stedet.
 3. Kopier Project URL og den offentlige publishable-nøkkelen til `config.js`.
 4. Legg de virkelige produktene i `products`-tabellen.
 
@@ -63,7 +63,7 @@ Den gamle lokale bildeimporten i `assets/products/` finnes fortsatt for utviklin
 
 1. Opprett en Resend-konto og verifiser avsenderdomenet.
 2. Deploy funksjonen `order-email` i Supabase.
-3. Legg inn secrets: `RESEND_API_KEY`, `ORDER_EMAIL`, `EMAIL_FROM` og en tilfeldig `WEBHOOK_SECRET`.
+3. Legg inn secrets: `RESEND_API_KEY`, `ORDER_EMAIL=leffernan@gmail.com`, `EMAIL_FROM` og en tilfeldig `WEBHOOK_SECRET`.
 4. Opprett en Supabase Database Webhook på `INSERT` i `public.orders` og pek den mot funksjonen.
 5. Legg samme verdi som `WEBHOOK_SECRET` i webhook-headeren `x-webhook-secret`.
 

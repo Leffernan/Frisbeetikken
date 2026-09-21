@@ -142,7 +142,7 @@ button:disabled { opacity: .48; cursor: wait; }
 .field-wide { grid-column: span 2; }
 .field-full { grid-column: 1 / -1; }
 .rim-ink-field { align-self: end; }
-.segmented-options { display: grid; grid-template-columns: repeat(3, 1fr); min-height: 48px; overflow: hidden; border: 1px solid var(--soft); border-radius: 9px; }
+.segmented-options { display: grid; grid-template-columns: repeat(5, minmax(118px, 1fr)); min-height: 48px; overflow-x: auto; border: 1px solid var(--soft); border-radius: 9px; }
 .segmented-options label { position: relative; display: grid; place-items: center; color: var(--ink); background: var(--paper); cursor: pointer; }
 .segmented-options label + label { border-left: 1px solid var(--soft); }
 .segmented-options input { position: absolute; width: 1px; height: 1px; min-height: 0; opacity: 0; }

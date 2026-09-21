@@ -11,7 +11,7 @@ create table if not exists public.products (
   grade smallint not null check (grade between 0 and 10),
   weight smallint check (weight between 1 and 300),
   plastic text,
-  rim_ink text not null default 'no' constraint products_rim_ink_check check (rim_ink in ('no', 'barely', 'yes')),
+  rim_ink text not null default 'no' constraint products_rim_ink_check check (rim_ink in ('no', 'under_barely', 'rim_barely', 'rim', 'under')),
   note text,
   image_front text,
   image_back text,
@@ -25,19 +25,18 @@ create table if not exists public.products (
 alter table public.products
   add column if not exists rim_ink text not null default 'no';
 
-do $$
-begin
-  if not exists (
-    select 1
-    from pg_constraint
-    where conname = 'products_rim_ink_check'
-      and conrelid = 'public.products'::regclass
-  ) then
-    alter table public.products
-      add constraint products_rim_ink_check check (rim_ink in ('no', 'barely', 'yes'));
-  end if;
-end;
-$$;
+-- Bevarer eksisterende produktinformasjon når de gamle ink-valgene utvides.
+alter table public.products drop constraint if exists products_rim_ink_check;
+update public.products
+set rim_ink = case rim_ink
+  when 'barely' then 'rim_barely'
+  when 'yes' then 'rim'
+  else rim_ink
+end
+where rim_ink in ('barely', 'yes');
+alter table public.products
+  add constraint products_rim_ink_check
+  check (rim_ink in ('no', 'under_barely', 'rim_barely', 'rim', 'under'));
 
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
@@ -45,7 +44,7 @@ create table if not exists public.orders (
   customer_name text not null,
   customer_email text not null,
   customer_phone text not null,
-  delivery_method text not null check (delivery_method in ('pickup', 'posten', 'postnord')),
+  delivery_method text not null check (delivery_method = 'pickup'),
   customer_note text,
   status text not null default 'reserved' check (status in ('reserved', 'confirmed', 'sold', 'cancelled', 'expired')),
   reserved_until timestamptz not null,
@@ -205,7 +204,7 @@ begin
     raise exception 'Navn, e-post og telefon er påkrevd';
   end if;
 
-  if delivery_method not in ('pickup', 'posten', 'postnord') then
+  if delivery_method <> 'pickup' then
     raise exception 'Ugyldig leveringsmåte';
   end if;
 

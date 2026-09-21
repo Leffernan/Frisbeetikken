@@ -14,8 +14,6 @@ type Order = {
 
 const deliveryLabels: Record<string, string> = {
   pickup: "Hentes etter avtale",
-  posten: "Sendes med Posten",
-  postnord: "Sendes med PostNord",
 };
 
 Deno.serve(async (request) => {
