@@ -159,7 +159,7 @@
         <div><span>Antall disker</span><strong id="cart-quantity"></strong></div>
         <div class="cart-total"><span>Totalt</span><strong id="cart-total"></strong></div>
         <p>Frakt avtales og kommer eventuelt i tillegg.</p>
-        <button class="primary-button" id="start-checkout" type="button">Reserver diskene</button>
+        <button class="primary-button" id="start-checkout" type="button">Gå til disken</button>
       </div>
     </aside>
 
@@ -175,10 +175,6 @@
         <h2 id="checkout-title">Reserver diskene</h2>
         <p>Reservasjonen gjelder i 48 timer. Vi tar kontakt for å avtale betaling og levering.</p>
       </div>
-      <div class="setup-notice" id="setup-notice" hidden>
-        <strong>Bestilling åpner snart</strong>
-        <span>Handlekurven kan testes, men Supabase må kobles til før reservasjoner kan sendes inn.</span>
-      </div>
       <form id="checkout-form">
         <label>Navn <input name="name" required autocomplete="name" /></label>
         <label>E-post <input name="email" type="email" required autocomplete="email" /></label>
@@ -193,7 +189,7 @@
           <input name="consent" type="checkbox" required />
           <span>Jeg godtar at opplysningene brukes for å behandle reservasjonen.</span>
         </label>
-        <button class="primary-button full-width" id="submit-order" type="submit">Send reservasjon</button>
+        <button class="primary-button full-width" id="submit-order" type="submit">Send bestilling</button>
         <p class="form-status full-width" id="form-status" aria-live="polite"></p>
       </form>
     </dialog>

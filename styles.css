@@ -194,11 +194,14 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
 }
 .shop-heading .favorite-box {
-  display: inline-block;
-  padding: .09em .2em .04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .04em .2em .12em;
   color: var(--lime);
   background: #282c20;
   line-height: .86;
+  vertical-align: middle;
 }
 .hero-copy > p:not(.eyebrow) {
   max-width: 590px;
@@ -235,6 +238,9 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
   box-shadow: 0 30px 80px rgba(0,0,0,.28), inset -30px -28px 50px rgba(63,89,26,.17);
   transform: translate(-50%, -50%) rotate(-13deg);
+  transform-origin: center;
+  animation: hero-disc-float 8s ease-in-out infinite;
+  will-change: transform;
 }
 .hero-disc::before, .hero-disc::after {
   position: absolute;
@@ -247,13 +253,14 @@ img { display: block; max-width: 100%; }
 .hero-disc .disc-brand {
   display: grid;
   gap: 1px;
-  font-family: "Mona Sans Variable", Arial, sans-serif;
+  font-family: "Brier", "Mona Sans Variable", Arial, sans-serif;
+  font-weight: 700;
   text-align: center;
 }
 .hero-disc .disc-brand small {
   color: #535450;
   font-size: clamp(13px, 1.5vw, 20px);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 7px;
 }
 .hero-disc .disc-brand strong {
@@ -262,6 +269,10 @@ img { display: block; max-width: 100%; }
   font-size: clamp(21px, 3vw, 42px);
   font-weight: 700;
   letter-spacing: -2px;
+}
+@keyframes hero-disc-float {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-13deg); }
+  50% { transform: translate(-50%, calc(-50% - 10px)) rotate(-10.5deg); }
 }
 .hero-stamp {
   position: absolute;
@@ -589,7 +600,6 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
 .checkout-dialog { max-width: 680px; padding: 38px; }
 .checkout-copy { padding-right: 35px; }
 .checkout-copy p:last-child { color: var(--muted); line-height: 1.55; }
-.setup-notice { display: grid; gap: 4px; margin: 22px 0; padding: 14px 16px; background: #fff1cb; border: 1px solid #e8cc75; border-radius: 10px; font-size: 13px; }
 .checkout-dialog form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 25px; }
 .delivery-choice {
   display: grid;
@@ -706,5 +716,10 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
   .full-width { grid-column: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

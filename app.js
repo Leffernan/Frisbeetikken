@@ -322,9 +322,7 @@ function closeCart() {
 
 function openCheckout() {
   closeCart();
-  const ready = isSupabaseReady();
-  $("#setup-notice").hidden = ready;
-  $("#submit-order").disabled = !ready;
+  $("#submit-order").disabled = !isSupabaseReady();
   elements.checkoutDialog.showModal();
 }
 
@@ -336,7 +334,7 @@ async function submitOrder(event) {
   const status = $("#form-status");
   const data = Object.fromEntries(new FormData(form));
   button.disabled = true;
-  button.textContent = "Reserverer …";
+  button.textContent = "Sender bestilling …";
   status.className = "form-status full-width";
   status.textContent = "";
 
@@ -366,7 +364,7 @@ async function submitOrder(event) {
     status.classList.add("error");
   } finally {
     button.disabled = false;
-    button.textContent = "Send reservasjon";
+    button.textContent = "Send bestilling";
   }
 }
 
