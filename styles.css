@@ -279,10 +279,12 @@ img { display: block; max-width: 100%; }
   right: 9%;
   bottom: 12%;
   z-index: 2;
-  display: grid;
+  display: flex;
   width: 116px;
   height: 116px;
-  place-items: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 18px;
   color: var(--lime);
   border: 2px solid var(--lime);
@@ -742,7 +744,15 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
   .hero-copy > p:not(.eyebrow) { margin-block: 23px; font-size: 16px; }
   .hero-art { position: absolute; right: 0; bottom: 0; width: 140px; min-height: 120px; }
   .hero-disc, .flight-line { display: none; }
-  .hero-stamp { right: 20px; bottom: 18px; width: 82px; height: 82px; }
+  .hero-stamp {
+    right: 20px;
+    bottom: 18px;
+    width: 82px;
+    height: 82px;
+    padding: 10px;
+    font-size: 9px;
+  }
+  .hero-stamp strong { margin-top: 3px; font-size: 22px; }
   .shop { padding: 58px 11px 72px; }
   .shop-heading { align-items: start; padding-inline: 5px; }
   .shop-heading h2 { font-size: 38px; }
