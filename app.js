@@ -331,9 +331,10 @@ function openCheckout() {
 async function submitOrder(event) {
   event.preventDefault();
   if (!isSupabaseReady()) return;
+  const form = event.currentTarget;
   const button = $("#submit-order");
   const status = $("#form-status");
-  const data = Object.fromEntries(new FormData(event.currentTarget));
+  const data = Object.fromEntries(new FormData(form));
   button.disabled = true;
   button.textContent = "Reserverer …";
   status.className = "form-status full-width";
@@ -356,7 +357,7 @@ async function submitOrder(event) {
     if (!response.ok) throw new Error(payload.message || "En av diskene kan ha blitt reservert av noen andre.");
     state.cart = [];
     persistCart();
-    event.currentTarget.reset();
+    form.reset();
     elements.checkoutDialog.close();
     showToast(`Reservasjonen er mottatt. Ordrenummer: ${payload.order_number || payload}`);
     await loadProducts();
