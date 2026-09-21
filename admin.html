@@ -100,6 +100,26 @@
       </section>
     </main>
 
+    <dialog class="delete-dialog" id="delete-dialog" aria-labelledby="delete-title">
+      <button class="dialog-close" id="delete-cancel-x" type="button" aria-label="Lukk">×</button>
+      <p class="eyebrow">Permanent sletting</p>
+      <h2 id="delete-title">Slett produkt?</h2>
+      <p id="delete-description"></p>
+      <label>Skriv varenummeret for å bekrefte
+        <input id="delete-confirmation" autocomplete="off" />
+      </label>
+      <p class="form-status" id="delete-status" aria-live="polite"></p>
+      <div class="delete-actions">
+        <button class="secondary-button" id="delete-cancel" type="button">Avbryt</button>
+        <button class="danger-button" id="delete-confirm" type="button" disabled>Slett varen</button>
+      </div>
+    </dialog>
+
+    <div class="undo-toast" id="delete-undo" role="status" aria-live="polite" hidden>
+      <span id="delete-undo-text"></span>
+      <button id="delete-undo-button" type="button">Angre</button>
+    </div>
+
     <datalist id="manufacturer-options"></datalist>
     <datalist id="plastic-options"></datalist>
     <script type="module" src="./admin.js"></script>

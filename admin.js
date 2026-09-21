@@ -10,6 +10,9 @@ const state = {
   products: new Map(),
   objectUrls: [],
   publishing: false,
+  pendingDelete: null,
+  undoProduct: null,
+  undoTimer: null,
 };
 
 const $ = (selector, parent = document) => parent.querySelector(selector);
@@ -41,6 +44,16 @@ const elements = {
   managerSearch: $("#manager-search"),
   managerCount: $("#manager-count"),
   managerList: $("#manager-list"),
+  deleteDialog: $("#delete-dialog"),
+  deleteDescription: $("#delete-description"),
+  deleteConfirmation: $("#delete-confirmation"),
+  deleteStatus: $("#delete-status"),
+  deleteConfirm: $("#delete-confirm"),
+  deleteCancel: $("#delete-cancel"),
+  deleteCancelX: $("#delete-cancel-x"),
+  deleteUndo: $("#delete-undo"),
+  deleteUndoText: $("#delete-undo-text"),
+  deleteUndoButton: $("#delete-undo-button"),
   manufacturerOptions: $("#manufacturer-options"),
   plasticOptions: $("#plastic-options"),
 };
@@ -318,7 +331,10 @@ function renderProductManager() {
           </div>
           <div class="manager-save-row">
             <p class="manager-status" aria-live="polite">Ingen endringer er lagret ennå.</p>
-            <button class="primary-button save-managed-product" type="button">Lagre endringer</button>
+            <div class="manager-actions">
+              <button class="delete-product-button" type="button">Slett vare</button>
+              <button class="primary-button save-managed-product" type="button">Lagre endringer</button>
+            </div>
           </div>
         </div>
       </div>
@@ -583,6 +599,101 @@ function setAdminView(view) {
   if (manage) renderProductManager();
 }
 
+function openDeleteDialog(card) {
+  const id = card.dataset.managerId;
+  const product = state.products.get(id);
+  if (!product) return;
+  state.pendingDelete = { id, product };
+  elements.deleteDescription.innerHTML = `Du er i ferd med å slette <strong>${escapeHtml(product.manufacturer)} ${escapeHtml(product.model)}</strong> (vare ${escapeHtml(id)}). Produktinformasjonen fjernes fra butikken, men bildene beholdes som sikkerhet.`;
+  elements.deleteConfirmation.value = "";
+  elements.deleteConfirmation.placeholder = id;
+  elements.deleteStatus.textContent = "";
+  elements.deleteStatus.classList.remove("error");
+  elements.deleteConfirm.disabled = true;
+  elements.deleteConfirm.textContent = "Slett varen";
+  elements.deleteDialog.showModal();
+  elements.deleteConfirmation.focus();
+}
+
+function closeDeleteDialog() {
+  if (elements.deleteDialog.open) elements.deleteDialog.close();
+  state.pendingDelete = null;
+}
+
+async function deleteProduct(id) {
+  const response = await authenticatedFetch(`/rest/v1/products?id=eq.${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Prefer: "return=representation" },
+  });
+  if (!response.ok) {
+    const message = await parseError(response, "Kunne ikke slette produktet.");
+    if (/foreign key|order_items|still referenced/i.test(message)) {
+      throw new Error("Varen er knyttet til en ordre og kan derfor ikke slettes. Sett status til Arkivert i stedet.");
+    }
+    throw new Error(message);
+  }
+  const [deleted] = await response.json();
+  if (!deleted) throw new Error("Produktet ble ikke funnet. Last siden på nytt.");
+  return deleted;
+}
+
+function hideUndo() {
+  clearTimeout(state.undoTimer);
+  state.undoTimer = null;
+  state.undoProduct = null;
+  elements.deleteUndo.hidden = true;
+}
+
+function showUndo(product) {
+  clearTimeout(state.undoTimer);
+  state.undoProduct = product;
+  elements.deleteUndoText.textContent = `Vare ${product.id} er slettet.`;
+  elements.deleteUndo.hidden = false;
+  state.undoTimer = setTimeout(hideUndo, 20_000);
+}
+
+async function confirmDelete() {
+  if (!state.pendingDelete || elements.deleteConfirmation.value.trim() !== state.pendingDelete.id) return;
+  const { id, product } = state.pendingDelete;
+  elements.deleteConfirm.disabled = true;
+  elements.deleteConfirm.textContent = "Sletter …";
+  elements.deleteStatus.textContent = "";
+  try {
+    const deleted = await deleteProduct(id);
+    state.products.delete(id);
+    elements.deleteDialog.close();
+    state.pendingDelete = null;
+    updateDatalists();
+    renderProductManager();
+    showUndo(deleted || product);
+  } catch (error) {
+    elements.deleteStatus.textContent = error.message;
+    elements.deleteStatus.classList.add("error");
+    elements.deleteConfirm.disabled = false;
+    elements.deleteConfirm.textContent = "Slett varen";
+  }
+}
+
+async function undoDelete() {
+  const product = state.undoProduct;
+  if (!product) return;
+  elements.deleteUndoButton.disabled = true;
+  elements.deleteUndoButton.textContent = "Gjenoppretter …";
+  try {
+    await saveProduct(product);
+    renderProductManager();
+    elements.deleteUndoText.textContent = `Vare ${product.id} er gjenopprettet.`;
+    state.undoProduct = null;
+    clearTimeout(state.undoTimer);
+    state.undoTimer = setTimeout(hideUndo, 4_000);
+  } catch (error) {
+    elements.deleteUndoText.textContent = `Kunne ikke angre: ${error.message}`;
+  } finally {
+    elements.deleteUndoButton.disabled = false;
+    elements.deleteUndoButton.textContent = "Angre";
+  }
+}
+
 async function publishGroup(group, index) {
   const card = $(`.product-editor[data-index="${index}"]`);
   const status = $(".editor-status", card);
@@ -698,9 +809,22 @@ elements.publishAll.addEventListener("click", publishAll);
 elements.tabs.forEach((tab) => tab.addEventListener("click", () => setAdminView(tab.dataset.adminView)));
 elements.managerSearch.addEventListener("input", renderProductManager);
 elements.managerList.addEventListener("click", (event) => {
-  const button = event.target.closest(".save-managed-product");
-  if (button) saveManagedProduct(button.closest(".manager-card"));
+  const saveButton = event.target.closest(".save-managed-product");
+  if (saveButton) saveManagedProduct(saveButton.closest(".manager-card"));
+  const deleteButton = event.target.closest(".delete-product-button");
+  if (deleteButton) openDeleteDialog(deleteButton.closest(".manager-card"));
 });
+elements.deleteConfirmation.addEventListener("input", () => {
+  elements.deleteConfirm.disabled = elements.deleteConfirmation.value.trim() !== state.pendingDelete?.id;
+});
+elements.deleteConfirm.addEventListener("click", confirmDelete);
+elements.deleteCancel.addEventListener("click", closeDeleteDialog);
+elements.deleteCancelX.addEventListener("click", closeDeleteDialog);
+elements.deleteDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeDeleteDialog();
+});
+elements.deleteUndoButton.addEventListener("click", undoDelete);
 
 if (state.session) {
   openWorkspace().catch((error) => {
