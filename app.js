@@ -18,6 +18,7 @@ const elements = {
   manufacturer: $("#manufacturer-filter"),
   grade: $("#grade-filter"),
   sort: $("#sort"),
+  hideUnavailable: $("#hide-unavailable"),
   cartDrawer: $("#cart-drawer"),
   cartItems: $("#cart-items"),
   cartEmpty: $("#cart-empty"),
@@ -89,7 +90,7 @@ async function loadProducts() {
   try {
     if (isSupabaseReady()) {
       const response = await fetch(
-        `${config.supabaseUrl}/rest/v1/products?select=*&status=in.(available,reserved)&order=created_at.desc`,
+        `${config.supabaseUrl}/rest/v1/products?select=*&status=in.(available,reserved,sold)&order=created_at.desc`,
         { headers: supabaseHeaders() },
       );
       if (!response.ok) throw new Error("Kunne ikke hente varer fra Supabase");
@@ -159,10 +160,12 @@ function visibleProducts() {
   const query = elements.search.value.trim().toLocaleLowerCase("nb");
   const manufacturer = elements.manufacturer.value;
   const minimumGrade = Number(elements.grade.value);
+  const hideUnavailable = elements.hideUnavailable.checked;
   const products = state.products.filter((product) => {
     const haystack = `${product.manufacturer} ${product.model} ${product.plastic} ${product.id}`.toLocaleLowerCase("nb");
     return (!query || haystack.includes(query)) &&
       (manufacturer === "all" || product.manufacturer === manufacturer) &&
+      (!hideUnavailable || product.status === "available") &&
       product.grade >= minimumGrade;
   });
 
@@ -184,6 +187,7 @@ function renderProducts() {
 
   for (const product of products) {
     const card = $("#product-card-template").content.cloneNode(true);
+    const cardElement = $(".product-card", card);
     const openButton = $(".product-open", card);
     const addButton = $(".add-button", card);
     const image = $(".product-image", card);
@@ -195,7 +199,10 @@ function renderProducts() {
     $(".product-weight", card).textContent = product.weight ? `${product.weight} g` : "Ukjent vekt";
     $(".product-price", card).textContent = money.format(product.price);
     $(".grade-badge", card).textContent = `${product.grade}/10`;
-    $(".status-badge", card).textContent = product.status === "reserved" ? "Reservert" : "";
+    const unavailableLabel = product.status === "reserved" ? "Reservert" : product.status === "sold" ? "Solgt" : "";
+    cardElement.classList.toggle("is-unavailable", product.status !== "available");
+    if (unavailableLabel) cardElement.classList.add(`is-${product.status}`);
+    $(".status-badge", card).textContent = unavailableLabel;
     openButton.setAttribute("aria-label", `Se ${product.manufacturer} ${product.model}`);
     openButton.addEventListener("click", () => openProduct(product));
     addButton.disabled = product.status !== "available" || state.cart.includes(product.id);
@@ -203,7 +210,9 @@ function renderProducts() {
       ? `I handlekurven <span aria-hidden="true">✓</span>`
       : product.status === "reserved"
         ? "Allerede reservert"
-        : `Legg i kurv <span aria-hidden="true">＋</span>`;
+        : product.status === "sold"
+          ? "Solgt"
+          : `Legg i kurv <span aria-hidden="true">＋</span>`;
     addButton.addEventListener("click", () => addToCart(product.id));
     elements.grid.append(card);
   }
@@ -224,6 +233,7 @@ function openProduct(product) {
       <div class="detail-copy">
         <p class="eyebrow">${escapeXml(product.manufacturer)}</p>
         <h2 id="dialog-product-name">${escapeXml(product.model)}</h2>
+        ${!available ? `<p class="detail-status detail-status-${escapeXml(product.status)}">${product.status === "reserved" ? "Reservert" : "Solgt"}</p>` : ""}
         <p class="detail-price">${money.format(product.price)}</p>
         <div class="detail-facts">
           <div><span>Grad</span><strong>${product.grade}/10</strong></div>
@@ -234,7 +244,7 @@ function openProduct(product) {
         <p class="detail-note">${escapeXml(product.note || "Ingen merknader registrert.")}</p>
         <p class="detail-number">Varenummer ${escapeXml(product.id)}</p>
         <button class="primary-button" id="detail-add" type="button" ${!available || state.cart.includes(product.id) ? "disabled" : ""}>
-          ${product.status === "reserved" ? "Allerede reservert" : state.cart.includes(product.id) ? "Ligger i handlekurven" : "Legg i handlekurven"}
+          ${product.status === "reserved" ? "Allerede reservert" : product.status === "sold" ? "Solgt" : state.cart.includes(product.id) ? "Ligger i handlekurven" : "Legg i handlekurven"}
         </button>
       </div>
     </div>`;
@@ -380,10 +390,11 @@ function resetFilters() {
   elements.manufacturer.value = "all";
   elements.grade.value = "0";
   elements.sort.value = "newest";
+  elements.hideUnavailable.checked = false;
   renderProducts();
 }
 
-for (const element of [elements.search, elements.manufacturer, elements.grade, elements.sort]) {
+for (const element of [elements.search, elements.manufacturer, elements.grade, elements.sort, elements.hideUnavailable]) {
   element.addEventListener(element === elements.search ? "input" : "change", renderProducts);
 }
 $("#reset-filters").addEventListener("click", resetFilters);

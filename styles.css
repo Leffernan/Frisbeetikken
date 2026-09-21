@@ -369,6 +369,38 @@ img { display: block; max-width: 100%; }
   font-size: 14px;
   font-weight: 600;
 }
+.availability-filter-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 13px 4px 0;
+}
+.availability-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+.availability-filter input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  appearance: none;
+  background: var(--paper);
+  border: 2px solid #9da294;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.availability-filter input:checked {
+  background: var(--lime);
+  border-color: var(--forest);
+  box-shadow: inset 0 0 0 4px var(--paper);
+}
+.availability-filter input:focus-visible { outline: 3px solid rgba(23,55,45,.2); outline-offset: 2px; }
 .product-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -387,6 +419,10 @@ img { display: block; max-width: 100%; }
   transition: transform .25s ease, box-shadow .25s ease;
 }
 .product-card:hover { box-shadow: var(--shadow); transform: translateY(-5px); }
+.product-card.is-unavailable { background: #f0f0e9; border-width: 2px; }
+.product-card.is-unavailable:hover { box-shadow: none; transform: none; }
+.product-card.is-reserved { border-color: #bb5c1a; }
+.product-card.is-sold { border-color: #282c20; }
 .product-open {
   display: block;
   width: 100%;
@@ -409,6 +445,12 @@ img { display: block; max-width: 100%; }
   transition: transform .4s ease;
 }
 .product-card:hover .product-image { transform: scale(1.025); }
+.product-card.is-unavailable .product-image {
+  opacity: .5;
+  filter: grayscale(.85) saturate(.35);
+}
+.product-card.is-unavailable:hover .product-image { transform: none; }
+.product-card.is-unavailable .product-copy { opacity: .62; }
 .grade-badge, .status-badge {
   position: absolute;
   top: 11px;
@@ -432,6 +474,18 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
 }
 .status-badge:empty { display: none; }
+.product-card.is-unavailable .status-badge {
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  min-height: 38px;
+  padding-inline: 17px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  font-size: 12px;
+  transform: translate(-50%, -50%);
+}
+.product-card.is-reserved .status-badge { background: #bb5c1a; }
+.product-card.is-sold .status-badge { background: #282c20; }
 .product-copy { padding: 17px 17px 12px; }
 .product-maker {
   margin: 0 0 4px;
@@ -590,6 +644,19 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
 .detail-copy { display: flex; flex-direction: column; padding: 58px 36px 34px; }
 .detail-copy h2 { margin: 4px 0 12px; font-size: clamp(38px, 5vw, 58px); }
 .detail-price { margin: 0 0 26px; font: 700 26px "Mona Sans Variable", Arial, sans-serif; }
+.detail-status {
+  align-self: flex-start;
+  margin: 2px 0 14px;
+  padding: 8px 12px;
+  color: white;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+.detail-status-reserved { background: #bb5c1a; }
+.detail-status-sold { background: #282c20; }
 .detail-facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 12px; margin: 0 0 26px; padding: 16px 0; border-block: 1px solid var(--line); }
 .detail-facts div { display: grid; gap: 3px; }
 .detail-facts span { color: var(--muted); font-size: 11px; text-transform: uppercase; }
@@ -701,6 +768,7 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
   .product-price { font-size: 16px; }
   .grade-badge { top: 7px; right: 7px; min-width: 36px; min-height: 36px; font-size: 11px; }
   .status-badge { top: 7px; left: 7px; min-height: 25px; padding-inline: 7px; font-size: 8px; }
+  .product-card.is-unavailable .status-badge { top: 50%; left: 50%; min-height: 32px; padding-inline: 12px; font-size: 10px; }
   .add-button { width: calc(100% - 16px); min-height: 38px; margin: auto 8px 8px; padding-inline: 10px; font-size: 11px; }
   .grading { padding: 58px 18px; }
   .grade-scale { grid-template-columns: repeat(2, 1fr); }

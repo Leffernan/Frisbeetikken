@@ -103,7 +103,7 @@ drop policy if exists "Public can view shop products" on public.products;
 create policy "Public can view shop products"
 on public.products for select
 to anon, authenticated
-using (status in ('available', 'reserved'));
+using (status in ('available', 'reserved', 'sold'));
 
 drop policy if exists "Admins can view all products" on public.products;
 create policy "Admins can view all products"
