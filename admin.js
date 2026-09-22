@@ -52,6 +52,8 @@ const elements = {
   publishTitle: $("#publish-title"),
   publishDetail: $("#publish-detail"),
   publishProgress: $("#publish-progress"),
+  salesTotal: $("#sales-total"),
+  salesCount: $("#sales-count"),
   managerSearch: $("#manager-search"),
   managerCount: $("#manager-count"),
   managerList: $("#manager-list"),
@@ -167,6 +169,16 @@ async function loadExistingProducts() {
 
   updateDatalists();
   renderProductManager();
+  renderSalesSummary();
+}
+
+function renderSalesSummary() {
+  const sold = [...state.products.values()].filter((product) => product.status === "sold");
+  const total = sold.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
+  elements.salesTotal.textContent = new Intl.NumberFormat("nb-NO", {
+    style: "currency", currency: "NOK", maximumFractionDigits: 0,
+  }).format(total);
+  elements.salesCount.textContent = sold.length === 1 ? "1 solgt disk" : `${sold.length} solgte disker`;
 }
 
 function updateDatalists() {
@@ -518,6 +530,7 @@ async function saveProduct(product) {
   const [saved] = await response.json();
   state.products.set(saved.id, saved);
   updateDatalists();
+  renderSalesSummary();
 }
 
 function readManagedProduct(card) {
@@ -573,6 +586,7 @@ async function patchManagedProduct(id, changes) {
   if (!saved) throw new Error("Produktet ble ikke funnet. Last siden på nytt.");
   state.products.set(saved.id, saved);
   updateDatalists();
+  renderSalesSummary();
   return saved;
 }
 
@@ -695,6 +709,7 @@ async function confirmDelete() {
   try {
     const deleted = await deleteProduct(id);
     state.products.delete(id);
+    renderSalesSummary();
     elements.deleteDialog.close();
     state.pendingDelete = null;
     updateDatalists();
