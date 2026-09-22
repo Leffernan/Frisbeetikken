@@ -11,7 +11,7 @@ const RIM_INK_OPTIONS = [
   ["under", "Ja - under"],
 ];
 const FLIGHT_FIELDS = [
-  ["flight_speed", "Fart"], ["flight_glide", "Glide"],
+  ["flight_speed", "Speed"], ["flight_glide", "Glide"],
   ["flight_turn", "Turn"], ["flight_fade", "Fade"],
 ];
 
@@ -276,7 +276,7 @@ function rimInkOptions(selected, name, field = "manage") {
 
 function flightInputs(product, attribute) {
   return `<fieldset class="field-full flight-fields">
-    <legend>Flight numbers <small>Fart / Glide / Turn / Fade</small></legend>
+    <legend>Flight numbers <small>Speed / Glide / Turn / Fade</small></legend>
     <div class="flight-input-grid">
       ${FLIGHT_FIELDS.map(([key, label]) => `<label>${label}
         <input ${attribute}="${key}" type="number" step="any" inputmode="decimal" value="${escapeHtml(product[key] ?? "")}" placeholder="–" />
