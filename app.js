@@ -9,6 +9,11 @@ const state = {
 const $ = (selector, parent = document) => parent.querySelector(selector);
 const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
 const money = new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", maximumFractionDigits: 0 });
+const flightNumber = new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 2 });
+const flightFields = [
+  ["flightSpeed", "Fart"], ["flightGlide", "Glide"],
+  ["flightTurn", "Turn"], ["flightFade", "Fade"],
+];
 
 const elements = {
   grid: $("#product-grid"),
@@ -119,6 +124,10 @@ function fromDatabaseProduct(row) {
     grade: Number(row.grade),
     weight: row.weight,
     plastic: row.plastic,
+    flightSpeed: row.flight_speed,
+    flightGlide: row.flight_glide,
+    flightTurn: row.flight_turn,
+    flightFade: row.flight_fade,
     rimInk: row.rim_ink || "no",
     note: row.note?.replace(/\bdisc\b/gi, "disk"),
     createdAt: row.created_at,
@@ -138,6 +147,15 @@ function rimInkLabel(value) {
     barely: "Ja - så vidt i rim",
     yes: "Ja - i rim",
   })[value] || "Nei";
+}
+
+function flightNumbersMarkup(product) {
+  return `<div class="flight-numbers" aria-label="Flight numbers: fart, glide, turn og fade">
+    ${flightFields.map(([key, label]) => {
+      const value = product[key] == null || product[key] === "" ? null : Number(product[key]);
+      return `<span><small>${label}</small><strong>${value !== null && Number.isFinite(value) ? flightNumber.format(value) : "–"}</strong></span>`;
+    }).join("")}
+  </div>`;
 }
 
 function supabaseHeaders() {
@@ -197,6 +215,7 @@ function renderProducts() {
     $(".product-name", card).textContent = product.model;
     $(".product-plastic", card).textContent = product.plastic || "Ukjent plast";
     $(".product-weight", card).textContent = product.weight ? `${product.weight} g` : "Ukjent vekt";
+    $(".product-flight", card).innerHTML = flightNumbersMarkup(product);
     $(".product-price", card).textContent = money.format(product.price);
     $(".grade-badge", card).textContent = `${product.grade}/10`;
     const unavailableLabel = product.status === "reserved" ? "Reservert" : product.status === "sold" ? "Solgt" : "";
@@ -240,6 +259,10 @@ function openProduct(product) {
           <div><span>Vekt</span><strong>${product.weight ? `${product.weight} g` : "–"}</strong></div>
           <div><span>Plast</span><strong>${escapeXml(product.plastic || "–")}</strong></div>
           <div><span>Ink</span><strong>${rimInkLabel(product.rimInk)}</strong></div>
+        </div>
+        <div class="detail-flight">
+          <p>Flight numbers</p>
+          ${flightNumbersMarkup(product)}
         </div>
         <p class="detail-note">${escapeXml(product.note || "Ingen merknader registrert.")}</p>
         <p class="detail-number">Varenummer ${escapeXml(product.id)}</p>

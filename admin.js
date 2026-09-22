@@ -10,6 +10,10 @@ const RIM_INK_OPTIONS = [
   ["rim", "Ja - i rim"],
   ["under", "Ja - under"],
 ];
+const FLIGHT_FIELDS = [
+  ["flight_speed", "Fart"], ["flight_glide", "Glide"],
+  ["flight_turn", "Turn"], ["flight_fade", "Fade"],
+];
 
 const state = {
   session: readSession(),
@@ -270,6 +274,30 @@ function rimInkOptions(selected, name, field = "manage") {
     </label>`).join("");
 }
 
+function flightInputs(product, attribute) {
+  return `<fieldset class="field-full flight-fields">
+    <legend>Flight numbers <small>Fart / Glide / Turn / Fade</small></legend>
+    <div class="flight-input-grid">
+      ${FLIGHT_FIELDS.map(([key, label]) => `<label>${label}
+        <input ${attribute}="${key}" type="number" step="any" inputmode="decimal" value="${escapeHtml(product[key] ?? "")}" placeholder="–" />
+      </label>`).join("")}
+    </div>
+  </fieldset>`;
+}
+
+function readFlightNumbers(card, attribute, existing) {
+  const result = {};
+  for (const [key] of FLIGHT_FIELDS) {
+    const raw = $(`[${attribute}="${key}"]`, card).value.trim();
+    // Før migreringen er kjørt, la tomme felt være ute av lagringskallet.
+    if (!Object.hasOwn(existing, key) && !raw) continue;
+    const value = raw ? Number(raw) : null;
+    if (value !== null && !Number.isFinite(value)) throw new Error("Flight numbers må være gyldige tall.");
+    result[key] = value;
+  }
+  return result;
+}
+
 function sortedProducts() {
   return [...state.products.values()].sort((a, b) => a.id.localeCompare(b.id, "nb", { numeric: true }));
 }
@@ -321,6 +349,7 @@ function renderProductManager() {
             <label>Plasttype
               <input data-manage-field="plastic" list="plastic-options" value="${escapeHtml(product.plastic)}" />
             </label>
+            ${flightInputs(product, "data-manage-field")}
             <fieldset class="field-full rim-ink-field">
               <legend>Er det ink?</legend>
               <div class="segmented-options">${rimInkOptions(product.rim_ink, `manage-rim-${product.id}`)}</div>
@@ -394,6 +423,7 @@ function renderGroups() {
             <label>Plasttype
               <input data-field="plastic" list="plastic-options" value="${escapeHtml(product.plastic)}" />
             </label>
+            ${flightInputs(product, "data-field")}
             <fieldset class="field-full rim-ink-field">
               <legend>Er det ink?</legend>
               <div class="segmented-options">${rimInkOptions(product.rim_ink, `rim-ink-${group.id}`, "import")}</div>
@@ -451,6 +481,7 @@ function readProduct(card, group) {
     grade: Number(get("grade")),
     weight: get("weight") ? Number(get("weight")) : null,
     plastic: get("plastic") || null,
+    ...readFlightNumbers(card, "data-field", existing),
     rim_ink: $('[data-field="rim_ink"]:checked', card)?.value || "no",
     note: get("note") || null,
     status: get("status"),
@@ -491,6 +522,7 @@ async function saveProduct(product) {
 
 function readManagedProduct(card) {
   const get = (name) => $(`[data-manage-field="${name}"]`, card).value.trim();
+  const existing = state.products.get(card.dataset.managerId) || {};
   const product = {
     manufacturer: get("manufacturer"),
     model: get("model"),
@@ -498,6 +530,7 @@ function readManagedProduct(card) {
     grade: Number(get("grade")),
     weight: get("weight") ? Number(get("weight")) : null,
     plastic: get("plastic") || null,
+    ...readFlightNumbers(card, "data-manage-field", existing),
     rim_ink: $('[data-manage-field="rim_ink"]:checked', card)?.value || "no",
     note: get("note") || null,
     status: get("status"),

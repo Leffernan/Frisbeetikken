@@ -503,8 +503,13 @@ img { display: block; max-width: 100%; }
   font: 700 clamp(17px, 1.5vw, 22px)/1.04 "Mona Sans Variable", Arial, sans-serif;
   letter-spacing: -.7px;
 }
-.product-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; color: var(--muted); font-size: 12px; }
+.product-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 11px; color: var(--muted); font-size: 12px; }
 .product-meta span + span::before { margin-right: 6px; content: "•"; }
+.product-flight { margin: 0 0 13px; }
+.flight-numbers { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.flight-numbers > span { display: grid; gap: 3px; min-width: 0; padding: 7px 2px 6px; background: var(--paper); border-radius: 6px; text-align: center; }
+.flight-numbers small { color: var(--muted); font-size: 9px; font-weight: 700; line-height: 1; text-transform: uppercase; }
+.flight-numbers strong { font-size: 15px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .product-price { margin: 0; font-size: 18px; font-weight: 700; }
 .add-button {
   display: flex;
@@ -663,6 +668,11 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
 .detail-facts div { display: grid; gap: 3px; }
 .detail-facts span { color: var(--muted); font-size: 11px; text-transform: uppercase; }
 .detail-facts strong { font-size: 15px; }
+.detail-flight { margin: 0 0 22px; }
+.detail-flight > p { margin: 0 0 9px; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.detail-flight .flight-numbers { gap: 8px; }
+.detail-flight .flight-numbers > span { padding: 12px 4px; background: #dde1d2; }
+.detail-flight .flight-numbers strong { font-size: 22px; }
 .detail-note { color: var(--muted); line-height: 1.65; }
 .detail-number { margin: auto 0 18px; color: var(--muted); font-size: 12px; }
 
@@ -767,6 +777,11 @@ dialog::backdrop { background: rgba(5, 18, 14, .66); backdrop-filter: blur(4px);
   .product-copy { padding: 12px 11px 9px; }
   .product-name { min-height: 2.3em; font-size: 16px; }
   .product-meta { min-height: 2.5em; margin: 7px 0 9px; font-size: 11px; }
+  .flight-numbers { gap: 2px; }
+  .product-flight { margin-bottom: 10px; }
+  .product-flight .flight-numbers > span { padding: 6px 1px; }
+  .product-flight .flight-numbers small { font-size: 8px; }
+  .product-flight .flight-numbers strong { font-size: 13px; }
   .product-price { font-size: 16px; }
   .grade-badge { top: 7px; right: 7px; min-width: 36px; min-height: 36px; font-size: 11px; }
   .status-badge { top: 7px; left: 7px; min-height: 25px; padding-inline: 7px; font-size: 8px; }

@@ -9,6 +9,7 @@ En rask, mobiltilpasset butikkfront for unike, brukte diskgolf-disker. Det er fe
 - Filtrering på produsent og minimumsgrad.
 - Sortering på nyeste, pris og grad.
 - Produktdetaljer med forside/bakside, vekt, plast, tilstand og pris.
+- Flight numbers (fart, glide, turn, fade) på produktkort og i produktdetaljene.
 - Handlekurv for flere unike disker, lagret lokalt i nettleseren.
 - Reserverte varer er synlige, men kan ikke legges i kurven.
 - Supabase-funksjon reserverer hele handlekurven atomisk og hindrer dobbeltreservasjon.
@@ -37,6 +38,8 @@ Den innloggede administrasjonssiden ligger på `admin.html`. Den grupperer autom
 Dra alle bildene inn samtidig. Du får ett produktkort per varenummer der produsent, modell, pris, grad, vekt, plasttype, eventuell ink og merknad fylles inn før publisering. JPG, JPEG, PNG, WebP og AVIF støttes, med maks 10 MB per bilde.
 
 Fanen **Administrer produkter** viser alle eksisterende varer fra Supabase. Der kan produktinformasjon, status og enkeltbilder oppdateres uten å laste opp hele bildeparet på nytt. Redigeringen bruker feltvise oppdateringer, så bilder og databaseverdier som ikke endres, beholdes. Sletting krever at varenummeret skrives inn som bekreftelse og kan angres i 20 sekunder; bildefilene beholdes i Storage som ekstra sikkerhet.
+
+Flight numbers er fire valgfrie tallfelt i både bildeimport og **Administrer produkter**. For en eksisterende database kjører du først `supabase/migrations/20260922_flight_numbers.sql` i Supabase SQL Editor. Migrasjonen legger bare til kolonner; eksisterende produkter og produktinformasjon beholdes. Tomme tall vises som «–» i butikken til du fyller dem inn.
 
 Første gangs oppsett:
 

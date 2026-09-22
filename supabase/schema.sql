@@ -11,6 +11,10 @@ create table if not exists public.products (
   grade smallint not null check (grade between 0 and 10),
   weight smallint check (weight between 1 and 300),
   plastic text,
+  flight_speed numeric,
+  flight_glide numeric,
+  flight_turn numeric,
+  flight_fade numeric,
   rim_ink text not null default 'no' constraint products_rim_ink_check check (rim_ink in ('no', 'under_barely', 'rim_barely', 'rim', 'under')),
   note text,
   image_front text,
@@ -24,6 +28,13 @@ create table if not exists public.products (
 -- Legger feltet til også når products-tabellen allerede finnes fra et tidligere oppsett.
 alter table public.products
   add column if not exists rim_ink text not null default 'no';
+
+-- Kan også kjøres mot en eksisterende produktkatalog uten å endre lagrede varer.
+alter table public.products
+  add column if not exists flight_speed numeric,
+  add column if not exists flight_glide numeric,
+  add column if not exists flight_turn numeric,
+  add column if not exists flight_fade numeric;
 
 -- Bevarer eksisterende produktinformasjon når de gamle ink-valgene utvides.
 alter table public.products drop constraint if exists products_rim_ink_check;
