@@ -54,6 +54,10 @@ const elements = {
   publishProgress: $("#publish-progress"),
   salesTotal: $("#sales-total"),
   salesCount: $("#sales-count"),
+  salesPossible: $("#sales-possible"),
+  salesReservedCount: $("#sales-reserved-count"),
+  salesBar: $("#sales-bar"),
+  salesBarFill: $("#sales-bar-fill"),
   managerSearch: $("#manager-search"),
   managerCount: $("#manager-count"),
   managerList: $("#manager-list"),
@@ -172,13 +176,24 @@ async function loadExistingProducts() {
   renderSalesSummary();
 }
 
+const salesCurrency = new Intl.NumberFormat("nb-NO", {
+  style: "currency", currency: "NOK", maximumFractionDigits: 0,
+});
+
 function renderSalesSummary() {
-  const sold = [...state.products.values()].filter((product) => product.status === "sold");
-  const total = sold.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
-  elements.salesTotal.textContent = new Intl.NumberFormat("nb-NO", {
-    style: "currency", currency: "NOK", maximumFractionDigits: 0,
-  }).format(total);
+  const products = [...state.products.values()];
+  const sold = products.filter((product) => product.status === "sold");
+  const reserved = products.filter((product) => product.status === "reserved");
+  const sumPrices = (items) => items.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
+  const confirmed = sumPrices(sold);
+  const possible = confirmed + sumPrices(reserved);
+  elements.salesTotal.textContent = salesCurrency.format(confirmed);
+  elements.salesPossible.textContent = salesCurrency.format(possible);
   elements.salesCount.textContent = sold.length === 1 ? "1 solgt disk" : `${sold.length} solgte disker`;
+  elements.salesReservedCount.textContent = reserved.length === 1 ? "1 reservert disk" : `${reserved.length} reserverte disker`;
+  elements.salesBarFill.style.width = possible > 0 ? `${Math.min(100, confirmed / possible * 100)}%` : "0%";
+  elements.salesBar.setAttribute("aria-label",
+    `Bekreftet salg: ${salesCurrency.format(confirmed)} av mulig total ${salesCurrency.format(possible)}`);
 }
 
 function updateDatalists() {
