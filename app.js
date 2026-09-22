@@ -11,7 +11,7 @@ const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector
 const money = new Intl.NumberFormat("nb-NO", { style: "currency", currency: "NOK", maximumFractionDigits: 0 });
 const flightNumber = new Intl.NumberFormat("nb-NO", { maximumFractionDigits: 2 });
 const flightFields = [
-  ["flightSpeed", "Fart"], ["flightGlide", "Glide"],
+  ["flightSpeed", "Speed"], ["flightGlide", "Glide"],
   ["flightTurn", "Turn"], ["flightFade", "Fade"],
 ];
 
@@ -150,7 +150,7 @@ function rimInkLabel(value) {
 }
 
 function flightNumbersMarkup(product) {
-  return `<div class="flight-numbers" aria-label="Flight numbers: fart, glide, turn og fade">
+  return `<div class="flight-numbers" aria-label="Flight numbers: speed, glide, turn og fade">
     ${flightFields.map(([key, label]) => {
       const value = product[key] == null || product[key] === "" ? null : Number(product[key]);
       return `<span><small>${label}</small><strong>${value !== null && Number.isFinite(value) ? flightNumber.format(value) : "–"}</strong></span>`;
