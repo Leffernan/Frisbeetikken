@@ -359,6 +359,82 @@ function openCheckout() {
   elements.checkoutDialog.showModal();
 }
 
+function celebrateOrder() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  if (!context) return;
+  canvas.className = "order-fireworks";
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.append(canvas);
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const size = Math.min(width, height);
+  canvas.width = Math.round(width * ratio);
+  canvas.height = Math.round(height * ratio);
+  context.scale(ratio, ratio);
+
+  const colors = ["#282c20", "#d2ff00", "#e27c42", "#fbca43", "#ffffff"];
+  const bursts = [
+    { x: width * .28, y: height * .38, delay: .25 },
+    { x: width * .7, y: height * .3, delay: .48 },
+    { x: width * .5, y: height * .52, delay: .72 },
+    { x: width * .78, y: height * .57, delay: .94 },
+  ];
+  const sparks = bursts.flatMap((burst, burstIndex) => Array.from({ length: 34 }, (_, index) => {
+    const angle = index * 2 * Math.PI / 34 + Math.random() * .13;
+    const speed = size * (.17 + Math.random() * .24);
+    return {
+      ...burst,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1.05 + Math.random() * .5,
+      color: colors[(index + burstIndex) % colors.length],
+    };
+  }));
+  const started = performance.now();
+
+  function draw(now) {
+    const elapsed = (now - started) / 1000;
+    context.clearRect(0, 0, width, height);
+
+    for (const burst of bursts) {
+      if (elapsed >= burst.delay) continue;
+      const progress = Math.min(elapsed / burst.delay, 1);
+      const rocketY = height * .9 + (burst.y - height * .9) * progress;
+      context.strokeStyle = "#282c20";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.moveTo(burst.x, rocketY + 28);
+      context.lineTo(burst.x, rocketY);
+      context.stroke();
+    }
+
+    for (const spark of sparks) {
+      const age = elapsed - spark.delay;
+      if (age < 0 || age > spark.life) continue;
+      const fade = Math.pow(1 - age / spark.life, 1.5);
+      const x = spark.x + spark.vx * age;
+      const y = spark.y + spark.vy * age + 110 * age * age;
+      context.globalAlpha = fade;
+      context.strokeStyle = spark.color;
+      context.lineWidth = 1.4 + 1.8 * fade;
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(x - spark.vx * .045, y - (spark.vy + 220 * age) * .045);
+      context.stroke();
+    }
+    context.globalAlpha = 1;
+
+    if (elapsed < 2.5) requestAnimationFrame(draw);
+    else canvas.remove();
+  }
+  requestAnimationFrame(draw);
+}
+
 async function submitOrder(event) {
   event.preventDefault();
   if (!isSupabaseReady()) return;
@@ -391,6 +467,7 @@ async function submitOrder(event) {
     form.reset();
     elements.checkoutDialog.close();
     showToast(`Reservasjonen er mottatt. Ordrenummer: ${payload.order_number || payload}`);
+    try { celebrateOrder(); } catch { /* Effekten skal aldri påvirke bestillingen. */ }
     await loadProducts();
   } catch (error) {
     status.textContent = error.message;
