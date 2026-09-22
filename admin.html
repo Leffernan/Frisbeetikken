@@ -8,7 +8,7 @@
     <title>Produktimport – Frisbeetikken</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link href="https://cdn.jsdelivr.net/npm/@fontsource-variable/mona-sans/index.css" rel="stylesheet" />
-    <link rel="stylesheet" href="./admin.css" />
+    <link rel="stylesheet" href="./admin.css?v=20260922-salgsgraf-1" />
   </head>
   <body>
     <header class="admin-header">
@@ -37,14 +37,27 @@
       <section class="workspace" id="workspace" hidden>
         <div class="admin-topline">
           <nav class="admin-tabs" aria-label="Administrasjon">
-          <button class="active" type="button" data-admin-view="import" aria-selected="true">Last opp varer</button>
-          <button type="button" data-admin-view="manage" aria-selected="false">Administrer produkter</button>
+            <button class="active" type="button" data-admin-view="import" aria-selected="true">Last opp varer</button>
+            <button type="button" data-admin-view="manage" aria-selected="false">Administrer produkter</button>
           </nav>
-          <aside class="sales-widget" aria-label="Oversikt over solgte varer">
-            <span class="sales-widget-label">Solgt for</span>
-            <strong class="sales-widget-total" id="sales-total">0 kr</strong>
-            <span class="sales-widget-detail" id="sales-count">0 solgte disker</span>
-            <small>Sum av prisene på varer merket Solgt.</small>
+          <aside class="sales-widget" aria-label="Salgsoversikt">
+            <span class="sales-widget-label">Salgsoversikt</span>
+            <div class="sales-widget-numbers">
+              <div>
+                <span>Bekreftet salg</span>
+                <strong id="sales-total">0 kr</strong>
+                <small id="sales-count">0 solgte disker</small>
+              </div>
+              <div>
+                <span>Mulig totalt</span>
+                <strong id="sales-possible">0 kr</strong>
+                <small id="sales-reserved-count">0 reserverte disker</small>
+              </div>
+            </div>
+            <div class="sales-widget-bar" id="sales-bar" role="img" aria-label="Ingen solgte eller reserverte varer">
+              <div class="sales-widget-fill" id="sales-bar-fill"></div>
+            </div>
+            <small class="sales-widget-caption">Mulig totalt = solgt + reservert, basert på registrerte priser.</small>
           </aside>
         </div>
 
@@ -130,6 +143,6 @@
 
     <datalist id="manufacturer-options"></datalist>
     <datalist id="plastic-options"></datalist>
-    <script type="module" src="./admin.js"></script>
+    <script type="module" src="./admin.js?v=20260922-salgsgraf-1"></script>
   </body>
 </html>
