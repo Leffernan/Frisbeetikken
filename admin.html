@@ -35,10 +35,18 @@
       </section>
 
       <section class="workspace" id="workspace" hidden>
-        <nav class="admin-tabs" aria-label="Administrasjon">
+        <div class="admin-topline">
+          <nav class="admin-tabs" aria-label="Administrasjon">
           <button class="active" type="button" data-admin-view="import" aria-selected="true">Last opp varer</button>
           <button type="button" data-admin-view="manage" aria-selected="false">Administrer produkter</button>
-        </nav>
+          </nav>
+          <aside class="sales-widget" aria-label="Oversikt over solgte varer">
+            <span class="sales-widget-label">Solgt for</span>
+            <strong class="sales-widget-total" id="sales-total">0 kr</strong>
+            <span class="sales-widget-detail" id="sales-count">0 solgte disker</span>
+            <small>Sum av prisene på varer merket Solgt.</small>
+          </aside>
+        </div>
 
         <section class="admin-view" id="import-view">
           <div class="intro">
