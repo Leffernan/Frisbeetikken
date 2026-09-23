@@ -64,6 +64,10 @@ main { width: min(1440px, 100%); margin: 0 auto; padding: clamp(36px, 6vw, 84px)
 .sales-widget-bar { height: 23px; overflow: hidden; background: #282b20; border-radius: 999px; }
 .sales-widget-fill { width: 0; height: 100%; background: #d2ff00; border-radius: inherit; transition: width .35s ease; }
 .sales-widget-caption { line-height: 1.4; }
+.inventory-value { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 18px; align-items: end; padding-top: 12px; border-top: 1px solid var(--cream); }
+.inventory-value span { color: var(--muted); font-size: 12px; font-weight: 700; }
+.inventory-value strong { grid-row: span 2; color: var(--forest); font-size: clamp(23px, 2.6vw, 31px); font-variant-numeric: tabular-nums; letter-spacing: -.04em; line-height: 1; white-space: nowrap; }
+.inventory-value small { color: var(--muted); font-size: 11px; }
 @media (max-width: 760px) { .admin-topline { flex-direction: column; align-items: stretch; } .admin-topline .admin-tabs { align-self: flex-start; } .sales-widget { width: 100%; } }
 .admin-tabs { display: inline-flex; gap: 5px; margin-bottom: clamp(38px, 5vw, 68px); padding: 5px; background: var(--cream); border-radius: 999px; }
 .admin-tabs button { min-height: 42px; padding: 8px 18px; color: var(--muted); background: transparent; border: 0; border-radius: 999px; font-weight: 750; cursor: pointer; }
