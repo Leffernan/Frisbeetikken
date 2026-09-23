@@ -58,6 +58,8 @@ const elements = {
   salesReservedCount: $("#sales-reserved-count"),
   salesBar: $("#sales-bar"),
   salesBarFill: $("#sales-bar-fill"),
+  inventoryTotal: $("#inventory-total"),
+  inventoryCount: $("#inventory-count"),
   managerSearch: $("#manager-search"),
   managerCount: $("#manager-count"),
   managerList: $("#manager-list"),
@@ -187,10 +189,14 @@ function renderSalesSummary() {
   const sumPrices = (items) => items.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
   const confirmed = sumPrices(sold);
   const possible = confirmed + sumPrices(reserved);
+  const inventory = products.filter((product) => !["sold", "archived"].includes(product.status));
+  const inventoryTotal = sumPrices(inventory);
   elements.salesTotal.textContent = salesCurrency.format(confirmed);
   elements.salesPossible.textContent = salesCurrency.format(possible);
   elements.salesCount.textContent = sold.length === 1 ? "1 solgt disk" : `${sold.length} solgte disker`;
   elements.salesReservedCount.textContent = reserved.length === 1 ? "1 reservert disk" : `${reserved.length} reserverte disker`;
+  elements.inventoryTotal.textContent = salesCurrency.format(inventoryTotal);
+  elements.inventoryCount.textContent = inventory.length === 1 ? "1 vare på lager" : `${inventory.length} varer på lager`;
   elements.salesBarFill.style.width = possible > 0 ? `${Math.min(100, confirmed / possible * 100)}%` : "0%";
   elements.salesBar.setAttribute("aria-label",
     `Bekreftet salg: ${salesCurrency.format(confirmed)} av mulig total ${salesCurrency.format(possible)}`);
