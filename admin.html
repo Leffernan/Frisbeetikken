@@ -8,7 +8,7 @@
     <title>Produktimport – Frisbeetikken</title>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link href="https://cdn.jsdelivr.net/npm/@fontsource-variable/mona-sans/index.css" rel="stylesheet" />
-    <link rel="stylesheet" href="./admin.css?v=20260922-salgsgraf-1" />
+    <link rel="stylesheet" href="./admin.css?v=20260923-lagerverdi-1" />
   </head>
   <body>
     <header class="admin-header">
@@ -58,6 +58,11 @@
               <div class="sales-widget-fill" id="sales-bar-fill"></div>
             </div>
             <small class="sales-widget-caption">Mulig totalt = solgt + reservert, basert på registrerte priser.</small>
+            <div class="inventory-value">
+              <span>Total verdi på varelager</span>
+              <strong id="inventory-total">0 kr</strong>
+              <small id="inventory-count">0 varer på lager</small>
+            </div>
           </aside>
         </div>
 
@@ -143,6 +148,6 @@
 
     <datalist id="manufacturer-options"></datalist>
     <datalist id="plastic-options"></datalist>
-    <script type="module" src="./admin.js?v=20260922-salgsgraf-1"></script>
+    <script type="module" src="./admin.js?v=20260923-lagerverdi-1"></script>
   </body>
 </html>
