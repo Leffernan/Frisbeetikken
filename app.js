@@ -489,7 +489,7 @@ function resetFilters() {
   elements.search.value = "";
   elements.manufacturer.value = "all";
   elements.grade.value = "0";
-  elements.sort.value = "newest";
+  elements.sort.value = "grade-desc";
   elements.hideUnavailable.checked = false;
   renderProducts();
 }
