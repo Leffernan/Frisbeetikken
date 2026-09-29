@@ -214,7 +214,7 @@ progress { width: min(480px, 100%); height: 5px; margin-top: 6px; accent-color: 
 .status-pill { padding: 6px 10px; color: var(--muted); background: var(--cream); border-radius: 999px; font-size: 11px; font-weight: 750; }
 .status-available { color: #155c37; background: #dff3e7; }
 .status-reserved { color: #765719; background: #fff0c8; }
-.status-sold, .status-archived { color: #666; background: #ecece8; }
+.status-sold, .status-sold_hidden, .status-archived { color: #666; background: #ecece8; }
 .status-draft { color: #6b4a7c; background: #f0e3f5; }
 .manager-chevron { color: var(--muted); font-size: 22px; transition: transform .2s ease; }
 .manager-card[open] .manager-chevron { transform: rotate(180deg); }
