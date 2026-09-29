@@ -184,12 +184,12 @@ const salesCurrency = new Intl.NumberFormat("nb-NO", {
 
 function renderSalesSummary() {
   const products = [...state.products.values()];
-  const sold = products.filter((product) => product.status === "sold");
+  const sold = products.filter((product) => ["sold", "sold_hidden"].includes(product.status));
   const reserved = products.filter((product) => product.status === "reserved");
   const sumPrices = (items) => items.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
   const confirmed = sumPrices(sold);
   const possible = confirmed + sumPrices(reserved);
-  const inventory = products.filter((product) => !["sold", "archived"].includes(product.status));
+  const inventory = products.filter((product) => !["sold", "sold_hidden", "archived"].includes(product.status));
   const inventoryTotal = sumPrices(inventory);
   elements.salesTotal.textContent = salesCurrency.format(confirmed);
   elements.salesPossible.textContent = salesCurrency.format(possible);
@@ -280,14 +280,14 @@ function preview(file, alt) {
 function statusOptions(selected) {
   return [
     ["draft", "Kladd"], ["available", "Tilgjengelig"], ["reserved", "Reservert"],
-    ["sold", "Solgt"], ["archived", "Arkivert"],
+    ["sold", "Solgt"], ["sold_hidden", "Solgt (skjult)"], ["archived", "Arkivert"],
   ].map(([value, label]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${label}</option>`).join("");
 }
 
 function statusLabel(status) {
   return ({
     draft: "Kladd", available: "Tilgjengelig", reserved: "Reservert",
-    sold: "Solgt", archived: "Arkivert",
+    sold: "Solgt", sold_hidden: "Solgt (skjult)", archived: "Arkivert",
   })[status] || status;
 }
 
