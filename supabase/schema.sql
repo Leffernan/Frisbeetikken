@@ -20,7 +20,7 @@ create table if not exists public.products (
   image_front text,
   image_back text,
   color text,
-  status text not null default 'available' check (status in ('draft', 'available', 'reserved', 'sold', 'archived')),
+  status text not null default 'available' check (status in ('draft', 'available', 'reserved', 'sold', 'sold_hidden', 'archived')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
