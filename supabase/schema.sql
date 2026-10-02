@@ -8,6 +8,7 @@ create table if not exists public.products (
   manufacturer text not null,
   model text not null,
   price numeric(10, 2) not null check (price >= 0),
+  sale_price numeric(10, 2) check (sale_price is null or sale_price >= 0),
   grade smallint not null check (grade between 0 and 10),
   weight smallint check (weight between 1 and 300),
   plastic text,
@@ -27,7 +28,8 @@ create table if not exists public.products (
 
 -- Legger feltet til også når products-tabellen allerede finnes fra et tidligere oppsett.
 alter table public.products
-  add column if not exists rim_ink text not null default 'no';
+  add column if not exists rim_ink text not null default 'no',
+  add column if not exists sale_price numeric(10, 2);
 
 -- Kan også kjøres mot en eksisterende produktkatalog uten å endre lagrede varer.
 alter table public.products
@@ -58,6 +60,9 @@ create table if not exists public.orders (
   delivery_method text not null check (delivery_method = 'pickup'),
   customer_note text,
   items jsonb not null default '[]'::jsonb,
+  subtotal numeric(10, 2) not null default 0 check (subtotal >= 0),
+  discount_percent integer not null default 0 check (discount_percent between 0 and 100),
+  discount_amount numeric(10, 2) not null default 0 check (discount_amount >= 0),
   total numeric(10, 2) not null default 0 check (total >= 0),
   status text not null default 'reserved' check (status in ('reserved', 'confirmed', 'sold', 'cancelled', 'expired')),
   reserved_until timestamptz not null,
@@ -69,6 +74,9 @@ create table if not exists public.orders (
 -- til private tabeller eller en service role-nøkkel.
 alter table public.orders
   add column if not exists items jsonb not null default '[]'::jsonb,
+  add column if not exists subtotal numeric(10, 2) not null default 0,
+  add column if not exists discount_percent integer not null default 0,
+  add column if not exists discount_amount numeric(10, 2) not null default 0,
   add column if not exists total numeric(10, 2) not null default 0;
 
 create table if not exists public.order_items (
@@ -194,6 +202,25 @@ using (bucket_id = 'product-images' and public.is_admin());
 -- Kundedata er aldri tilgjengelig via den offentlige nøkkelen.
 -- Oppretting skjer bare gjennom reserve_order() nedenfor.
 
+create or replace function public.weekend_campaign_status()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select jsonb_build_object(
+    'configured', true,
+    'active', now() >= timestamp with time zone '2026-10-02 14:04:00+02'
+      and now() < timestamp with time zone '2026-10-05 00:00:00+02',
+    'starts_at', timestamp with time zone '2026-10-02 14:04:00+02',
+    'ends_at', timestamp with time zone '2026-10-05 00:00:00+02'
+  );
+$$;
+
+revoke all on function public.weekend_campaign_status() from public;
+grant execute on function public.weekend_campaign_status() to anon, authenticated;
+
 create or replace function public.reserve_order(
   product_ids text[],
   customer_name text,
@@ -213,6 +240,9 @@ declare
   requested_count integer;
   available_count integer;
   order_items_snapshot jsonb;
+  order_subtotal numeric(10, 2);
+  campaign_discount_percent integer := 0;
+  campaign_discount_amount numeric(10, 2) := 0;
   order_total numeric(10, 2);
 begin
   if coalesce(array_length(product_ids, 1), 0) = 0 then
@@ -231,7 +261,7 @@ begin
 
   select count(distinct item) into requested_count from unnest(product_ids) item;
 
-  -- FOR UPDATE gjør at to samtidige kunder ikke kan reservere samme disk.
+  -- Låser varene slik at to samtidige kunder ikke kan reservere samme disk.
   perform id
   from public.products
   where id = any(product_ids)
@@ -246,15 +276,33 @@ begin
     raise exception 'En eller flere disker er ikke lenger tilgjengelige';
   end if;
 
-  select
-    coalesce(jsonb_agg(jsonb_build_object(
-      'id', p.id,
-      'manufacturer', p.manufacturer,
-      'model', p.model,
-      'price', p.price
-    ) order by p.id), '[]'::jsonb),
-    coalesce(sum(p.price), 0)
-  into order_items_snapshot, order_total
+  select coalesce(sum(p.price), 0)
+  into order_subtotal
+  from public.products p
+  where p.id = any(product_ids);
+
+  -- Helgekampanje: Oslo-tid 2. oktober til og med 4. oktober 2026 kl. 23.59.
+  if now() >= timestamp with time zone '2026-10-02 14:04:00+02'
+     and now() < timestamp with time zone '2026-10-05 00:00:00+02' then
+    if requested_count >= 3 then
+      campaign_discount_percent := 30;
+    elsif requested_count = 2 then
+      campaign_discount_percent := 20;
+    end if;
+  end if;
+
+  campaign_discount_amount := round(order_subtotal * campaign_discount_percent / 100.0, 2);
+  order_total := order_subtotal - campaign_discount_amount;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+    'id', p.id,
+    'manufacturer', p.manufacturer,
+    'model', p.model,
+    'original_price', p.price,
+    'price', round(p.price * (100 - campaign_discount_percent) / 100.0, 2),
+    'discount_percent', campaign_discount_percent
+  ) order by p.id), '[]'::jsonb)
+  into order_items_snapshot
   from public.products p
   where p.id = any(product_ids);
 
@@ -262,7 +310,8 @@ begin
 
   insert into public.orders (
     order_number, customer_name, customer_email, customer_phone,
-    delivery_method, customer_note, items, total, reserved_until
+    delivery_method, customer_note, items, subtotal, discount_percent,
+    discount_amount, total, reserved_until
   ) values (
     new_order_number,
     left(trim(customer_name), 120),
@@ -271,22 +320,30 @@ begin
     delivery_method,
     left(customer_note, 1000),
     order_items_snapshot,
+    order_subtotal,
+    campaign_discount_percent,
+    campaign_discount_amount,
     order_total,
     now() + interval '48 hours'
   ) returning id into new_order_id;
 
   insert into public.order_items (order_id, product_id, price)
-  select new_order_id, id, price
+  select new_order_id, id, round(price * (100 - campaign_discount_percent) / 100.0, 2)
   from public.products
   where id = any(product_ids);
 
   update public.products
-  set status = 'reserved', updated_at = now()
+  set status = 'reserved',
+      sale_price = round(price * (100 - campaign_discount_percent) / 100.0, 2),
+      updated_at = now()
   where id = any(product_ids);
 
   return jsonb_build_object(
     'order_id', new_order_id,
     'order_number', new_order_number,
+    'subtotal', order_subtotal,
+    'discount_percent', campaign_discount_percent,
+    'discount_amount', campaign_discount_amount,
     'total', order_total,
     'reserved_until', now() + interval '48 hours'
   );
@@ -313,7 +370,7 @@ begin
     returning id
   ), released as (
     update public.products p
-    set status = 'available', updated_at = now()
+    set status = 'available', sale_price = null, updated_at = now()
     from public.order_items oi
     where oi.product_id = p.id
       and oi.order_id in (select id from expired_orders)
