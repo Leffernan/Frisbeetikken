@@ -14,7 +14,7 @@
       href="https://cdn.jsdelivr.net/npm/@fontsource-variable/mona-sans/index.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20261002-helgekampanje-1" />
   </head>
   <body>
     <a class="skip-link" href="#products">Hopp til produktene</a>
@@ -58,6 +58,19 @@
       </section>
 
       <section class="shop" id="products" aria-labelledby="products-title">
+        <section class="campaign-hero" id="weekend-campaign" aria-labelledby="campaign-title" hidden>
+          <div class="campaign-copy">
+            <p class="eyebrow">Helgekampanje · til søndag kl. 23.59</p>
+            <h2 id="campaign-title">Flere disker.<br /><span>Mer rabatt.</span></h2>
+            <p>Rabatten trekkes automatisk i handlekurven og låses når bestillingen sendes.</p>
+          </div>
+          <div class="campaign-offers" aria-label="Kampanjetilbud">
+            <div><strong>20%</strong><span>ved 2 disker</span></div>
+            <div><strong>30%</strong><span>ved 3+ disker</span></div>
+            <a href="#product-grid">Finn diskene <span aria-hidden="true">↓</span></a>
+          </div>
+        </section>
+
         <div class="shop-heading">
           <div>
             <p class="eyebrow">Alle disker</p>
@@ -164,7 +177,12 @@
       </div>
       <div class="cart-summary" id="cart-summary" hidden>
         <div><span>Antall disker</span><strong id="cart-quantity"></strong></div>
+        <div id="cart-subtotal-row" hidden><span>Delsum</span><strong id="cart-subtotal"></strong></div>
+        <div class="cart-discount" id="cart-discount-row" hidden>
+          <span id="cart-discount-label">Helgerabatt</span><strong id="cart-discount"></strong>
+        </div>
         <div class="cart-total"><span>Totalt</span><strong id="cart-total"></strong></div>
+        <p class="campaign-cart-message" id="campaign-cart-message" hidden></p>
         <p>Frakt avtales og kommer eventuelt i tillegg.</p>
         <button class="primary-button" id="start-checkout" type="button">Gå til kassa</button>
       </div>
@@ -223,6 +241,6 @@
       </article>
     </template>
 
-    <script type="module" src="./app.js?v=20260925-grad-desc"></script>
+    <script type="module" src="./app.js?v=20261002-helgekampanje-1"></script>
   </body>
 </html>
