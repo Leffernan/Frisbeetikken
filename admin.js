@@ -187,8 +187,12 @@ function renderSalesSummary() {
   const sold = products.filter((product) => ["sold", "sold_hidden"].includes(product.status));
   const reserved = products.filter((product) => product.status === "reserved");
   const sumPrices = (items) => items.reduce((sum, product) => sum + (Number(product.price) || 0), 0);
-  const confirmed = sumPrices(sold);
-  const possible = confirmed + sumPrices(reserved);
+  const sumSalePrices = (items) => items.reduce(
+    (sum, product) => sum + (Number(product.sale_price ?? product.price) || 0),
+    0,
+  );
+  const confirmed = sumSalePrices(sold);
+  const possible = confirmed + sumSalePrices(reserved);
   const inventory = products.filter((product) => !["sold", "sold_hidden", "archived"].includes(product.status));
   const inventoryTotal = sumPrices(inventory);
   elements.salesTotal.textContent = salesCurrency.format(confirmed);
@@ -557,6 +561,7 @@ async function saveProduct(product) {
 function readManagedProduct(card) {
   const get = (name) => $(`[data-manage-field="${name}"]`, card).value.trim();
   const existing = state.products.get(card.dataset.managerId) || {};
+  const selectedStatus = get("status");
   const product = {
     manufacturer: get("manufacturer"),
     model: get("model"),
@@ -567,7 +572,10 @@ function readManagedProduct(card) {
     ...readFlightNumbers(card, "data-manage-field", existing),
     rim_ink: $('[data-manage-field="rim_ink"]:checked', card)?.value || "no",
     note: get("note") || null,
-    status: get("status"),
+    status: selectedStatus,
+    sale_price: ["available", "draft", "archived"].includes(selectedStatus)
+      ? null
+      : existing.sale_price ?? null,
     updated_at: new Date().toISOString(),
   };
 
