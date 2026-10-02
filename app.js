@@ -4,6 +4,8 @@ const state = {
   products: [],
   cart: JSON.parse(localStorage.getItem("frisbeetikken-cart") || "[]"),
   activeProduct: null,
+  campaignActive: false,
+  campaignConfigured: false,
 };
 
 const $ = (selector, parent = document) => parent.querySelector(selector);
@@ -14,6 +16,10 @@ const flightFields = [
   ["flightSpeed", "Speed"], ["flightGlide", "Glide"],
   ["flightTurn", "Turn"], ["flightFade", "Fade"],
 ];
+const WEEKEND_CAMPAIGN = {
+  startsAt: new Date("2026-10-02T14:04:00+02:00"),
+  endsAt: new Date("2026-10-05T00:00:00+02:00"),
+};
 
 const elements = {
   grid: $("#product-grid"),
@@ -32,6 +38,13 @@ const elements = {
   productDialog: $("#product-dialog"),
   checkoutDialog: $("#checkout-dialog"),
   toast: $("#toast"),
+  campaignHero: $("#weekend-campaign"),
+  cartSubtotalRow: $("#cart-subtotal-row"),
+  cartSubtotal: $("#cart-subtotal"),
+  cartDiscountRow: $("#cart-discount-row"),
+  cartDiscountLabel: $("#cart-discount-label"),
+  cartDiscount: $("#cart-discount"),
+  campaignCartMessage: $("#campaign-cart-message"),
 };
 
 function escapeXml(value) {
@@ -313,6 +326,52 @@ function cartProducts() {
   return state.cart.map((id) => state.products.find((product) => product.id === id)).filter(Boolean);
 }
 
+function campaignIsActive(now = new Date()) {
+  return state.campaignConfigured &&
+    now >= WEEKEND_CAMPAIGN.startsAt &&
+    now < WEEKEND_CAMPAIGN.endsAt;
+}
+
+async function loadCampaignStatus() {
+  if (!isSupabaseReady()) return;
+  try {
+    const response = await fetch(`${config.supabaseUrl}/rest/v1/rpc/weekend_campaign_status`, {
+      method: "POST",
+      headers: supabaseHeaders(),
+      body: "{}",
+    });
+    if (!response.ok) return;
+    const payload = await response.json();
+    state.campaignConfigured = payload?.configured === true;
+    refreshCampaignUi();
+  } catch {
+    // Kampanjen holdes skjult dersom databaseoppdateringen ikke er aktivert.
+  }
+}
+
+function campaignDiscountRate(quantity, now = new Date()) {
+  if (!campaignIsActive(now)) return 0;
+  if (quantity >= 3) return 30;
+  if (quantity === 2) return 20;
+  return 0;
+}
+
+function cartPricing(products, now = new Date()) {
+  const subtotal = products.reduce((sum, product) => sum + product.price, 0);
+  const rate = campaignDiscountRate(products.length, now);
+  const discount = Math.round(subtotal * rate) / 100;
+  return { subtotal, rate, discount, total: subtotal - discount };
+}
+
+function refreshCampaignUi() {
+  const active = campaignIsActive();
+  elements.campaignHero.hidden = !active;
+  if (state.campaignActive !== active) {
+    state.campaignActive = active;
+    if (state.products.length) renderCart();
+  }
+}
+
 function renderCart() {
   const products = cartProducts();
   $("#cart-count").textContent = products.length;
@@ -334,8 +393,25 @@ function renderCart() {
   $$('[data-remove]', elements.cartItems).forEach((button) => button.addEventListener("click", () => removeFromCart(button.dataset.remove)));
   elements.cartEmpty.hidden = products.length > 0;
   elements.cartSummary.hidden = products.length === 0;
+  const pricing = cartPricing(products);
   $("#cart-quantity").textContent = products.length;
-  $("#cart-total").textContent = money.format(products.reduce((sum, product) => sum + product.price, 0));
+  elements.cartSubtotal.textContent = money.format(pricing.subtotal);
+  elements.cartDiscountLabel.textContent = `Helgerabatt (${pricing.rate} %)`;
+  elements.cartDiscount.textContent = `−${money.format(pricing.discount)}`;
+  $("#cart-total").textContent = money.format(pricing.total);
+  elements.cartSubtotalRow.hidden = pricing.rate === 0;
+  elements.cartDiscountRow.hidden = pricing.rate === 0;
+  if (state.campaignActive && products.length === 1) {
+    elements.campaignCartMessage.textContent = "Legg til én disk til og få 20 % rabatt på begge.";
+    elements.campaignCartMessage.hidden = false;
+  } else if (state.campaignActive && products.length >= 2) {
+    elements.campaignCartMessage.textContent = pricing.rate === 20
+      ? "Legg til én disk til og øk rabatten til 30 %."
+      : "30 % helgerabatt er trukket fra automatisk.";
+    elements.campaignCartMessage.hidden = false;
+  } else {
+    elements.campaignCartMessage.hidden = true;
+  }
 }
 
 function openCart() {
@@ -509,5 +585,8 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && elements.cartDrawer.classList.contains("open")) closeCart();
 });
 $("#year").textContent = new Date().getFullYear();
+refreshCampaignUi();
+setInterval(refreshCampaignUi, 30_000);
 
+loadCampaignStatus();
 loadProducts();
